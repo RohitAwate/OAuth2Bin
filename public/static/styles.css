@@ -1,0 +1,11 @@
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.vertical-center {
+    min-height: 100%; 
+    min-height: 90vh;
+
+    display: flex;
+    align-items: center;
+}

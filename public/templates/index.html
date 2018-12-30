@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
+    integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" href="public/static/index.css">
+    <link rel="stylesheet" href="public/static/styles.css">
     <script src="public/static/index.js"></script>
     <title>OAuth 2.0 Bin</title>
 </head>
@@ -49,29 +49,29 @@
                 <h5 class="text-dark ml-3 mt-4 font-weight-bold">Parameters</h5>
                 <div class="col-md-4 col-xs-10 mt-3">
                     <dt>Authorization URL</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">https://oauth2bin.herokuapp.com/authorize</span>
+                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.AuthURL}}</span>
                 </div>
 
                 <div class="col-md-4 col-xs-10 mt-3">
                     <dt>Access Token URL</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">https://oauth2bin.herokuapp.com/token</span>
+                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.TokenURL}}</span>
                 </div>
 
                 <div class="col-md-4 col-xs-10 mt-3">
                     <dt>Client ID</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">client-id</span>
+                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientID}}</span>
                 </div>
 
                 <div class="col-md-4 col-xs-10 mt-3">
                     <dt>Client Secret</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">client-secret</span>
+                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientSecret}}</span>
                 </div>
 
                 <hr class="col-md-4 col-xs-12 float-left">
 
                 <h5 class="text-dark ml-3 mt-5 font-weight-bold">Authorization Grant Request</h5>
                 <p class="text-monospace bg-secondary d-inline p-1 ml-3 rounded col-md-4">
-                    https://oauth2bin.herokuapp.com/authorize?response_type=code&client_id=client-id&redirect_uri=https://my-redirect-uri.com&scope=hello-world
+                        {{.AuthCodeCnfg.AuthURL}}?response_type=code&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
                 </p>
                 <div class="col-md-4 col-xs-12 mt-4">
                     <span class="font-weight-bold badge-dark rounded p-1 text-monospace">response_type=code</span>

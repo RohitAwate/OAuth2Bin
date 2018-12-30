@@ -1,9 +1,7 @@
 package oauth2
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
+	"html/template"
 	"net/http"
 )
 
@@ -13,10 +11,13 @@ type OA2Server struct {
 	Config OA2Config
 }
 
+var serverConfig OA2Config
+
 // NewOA2Server returns a new OAuth 2.0 server which runs
 // on the specified port with the specified configuration
-func NewOA2Server(port int) *OA2Server {
-	return &OA2Server{Port: port}
+func NewOA2Server(port int, config OA2Config) *OA2Server {
+	serverConfig = config
+	return &OA2Server{Port: port, Config: config}
 }
 
 // Start listening for requests
@@ -25,17 +26,30 @@ func (s *OA2Server) Start() {
 	http.Handle("/public/", http.StripPrefix("/public/", public))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		file, err := ioutil.ReadFile("public/index.html")
+		template, err := template.ParseFiles("public/templates/index.html")
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 
-		w.Write(file)
+		template.Execute(w, s.Config)
 	})
-	http.HandleFunc("/auth", handleAuth)
+
+	http.HandleFunc("/authorize", handleAuth)
 	http.ListenAndServe(":8080", nil)
 }
 
+// Routes the request to a FlowHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello world!")
+	queryParams := r.URL.Query()
+
+	var handler FlowHandler
+	switch queryParams.Get("response_type") {
+	case "code":
+		handler = &AuthCodeHandler{Config: &(serverConfig.AuthCodeCnfg)}
+	default:
+		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: "response_type is required"})
+		return
+	}
+
+	handler.Handle(w, r)
 }
