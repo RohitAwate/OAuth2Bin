@@ -6,6 +6,7 @@ type AuthCodeConfig struct {
 	TokenURL     string
 	ClientID     string
 	ClientSecret string
+	AuthGrant    string
 	AccessToken  string
 }
 

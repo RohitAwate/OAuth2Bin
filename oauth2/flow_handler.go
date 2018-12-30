@@ -6,11 +6,7 @@ import (
 
 // FlowHandler handles the request for a specific OAuth 2.0 flow
 type FlowHandler interface {
-	Handle(w http.ResponseWriter, r *http.Request)
-}
-
-type scopeString struct {
-	Scope string
+	HandleGrant(w http.ResponseWriter, r *http.Request)
 }
 
 //------------------------------- Implementations -------------------------------
@@ -20,9 +16,9 @@ type AuthCodeHandler struct {
 	Config *AuthCodeConfig
 }
 
-// Handle extracts the query parameters, presents an authorization screen
+// HandleGrant extracts the query parameters, presents an authorization screen
 // and redirects to the redirect URL
-func (h *AuthCodeHandler) Handle(w http.ResponseWriter, r *http.Request) {
+func (h *AuthCodeHandler) HandleGrant(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 
 	if queryParams.Get("redirect_uri") == "" && queryParams.Get("client_id") == "" {

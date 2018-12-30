@@ -9,6 +9,7 @@ func main() {
 		AuthURL:      "http://localhost:8080/authorize",
 		TokenURL:     "http://localhost:8080/token",
 		ClientID:     "clientID",
+		AuthGrant:    "authGrant",
 		ClientSecret: "clientSecret",
 		AccessToken:  "accessToken",
 	}

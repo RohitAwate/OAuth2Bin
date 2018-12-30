@@ -26,19 +26,20 @@
             <h1>The application would like to</h1>
             <div class="p-3 rounded">
                 <ul class="list-group">
-                    {{ range . }}
-                    <li class="list-group-item bg-secondary text-left">{{ .Scope }}</li>
+                    {{ range .ScopeList }}
+                    <li class="list-group-item bg-secondary text-left">{{ . }}</li>
                     {{ end }}
                 </ul>
             </div>
             <hr>
             <div class="text-center">
                 <p class="text-muted">By clicking 'Accept', you agree that you are awesome.</p>
-                <button class="btn btn-dark" type="submit">CANCEL</button>
-                <button class="btn btn-primary" type="submit">ACCEPT</button>
+                <button class="btn btn-dark" id="cancelBtn" type="submit">CANCEL</button>
+                <button class="btn btn-primary" id="acceptBtn" type="submit">ACCEPT</button>
             </div>
         </div>
     </div>
+    <script src="/public/static/auth_grant.js"></script>
 </body>
 
 </html>

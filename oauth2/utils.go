@@ -8,12 +8,18 @@ import (
 
 // PresentAuthScreen shows the authorization screen to the user
 func PresentAuthScreen(w http.ResponseWriter, r *http.Request) {
-	scopeList := []scopeString{
-		{"Go to Mars"},
-		{"Travel back in time"},
+	scopeList := []string{
+		"Go to Mars",
+		"Travel back in time",
 	}
 
-	RenderTemplate(w, r, "auth_grant", 200, scopeList)
+	authScreenStruct := struct {
+		ScopeList []string
+	}{
+		ScopeList: scopeList,
+	}
+
+	RenderTemplate(w, r, "auth_grant", 200, authScreenStruct)
 }
 
 // NotFound presents the 404 screen to the user
