@@ -6,15 +6,15 @@ import (
 
 func main() {
 	acc := oauth2.AuthCodeConfig{
-		AuthURL:      "https://oauth2bin.herokuapp.com/authorize",
-		TokenURL:     "https://oauth2bin.herokuapp.com/token",
+		AuthURL:      "http://localhost:8080/authorize",
+		TokenURL:     "http://localhost:8080/token",
 		ClientID:     "clientID",
 		ClientSecret: "clientSecret",
 		AccessToken:  "accessToken",
 	}
 
 	ic := oauth2.ImplicitConfig{
-		AuthURL:     "https://oauth2bin.herokuapp.com/authorize",
+		AuthURL:     "https://localhost:8080/authorize",
 		ClientID:    "clientID",
 		AccessToken: "accessToken",
 	}
