@@ -1,9 +1,7 @@
 package oauth2
 
 import (
-	"encoding/json"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 )
 
@@ -38,45 +36,6 @@ func (s *OA2Server) Start() {
 
 	http.HandleFunc("/authorize", handleAuth)
 	http.HandleFunc("/accepted", handleAccepted)
+	http.HandleFunc("/token", handleToken)
 	http.ListenAndServe(":8080", nil)
-}
-
-// Routes the request to a FlowHandler based on the request_type
-func handleAuth(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-
-	var handler FlowHandler
-	switch queryParams.Get("response_type") {
-	case "code":
-		handler = &AuthCodeHandler{Config: &(serverConfig.AuthCodeCnfg)}
-	default:
-		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: "response_type is required"})
-		return
-	}
-
-	handler.HandleGrant(w, r)
-}
-
-func handleAccepted(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: r.Method + " not allowed."})
-		return
-	}
-
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: "Could not read body of request."})
-		return
-	}
-
-	var msg map[string]string
-	err = json.Unmarshal(body, &msg)
-	if err != nil {
-		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: "Invalid JSON found in request body."})
-		return
-	}
-
-	redirectURI := msg["redirect_uri"] + "?code=" + serverConfig.AuthCodeCnfg.AuthGrant
-	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
 }

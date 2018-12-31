@@ -1,13 +1,15 @@
 package oauth2
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
+	"strings"
 )
 
-// PresentAuthScreen shows the authorization screen to the user
-func PresentAuthScreen(w http.ResponseWriter, r *http.Request) {
+// presentAuthScreen shows the authorization screen to the user
+func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
 	scopeList := []string{
 		"Go to Mars",
 		"Travel back in time",
@@ -19,27 +21,39 @@ func PresentAuthScreen(w http.ResponseWriter, r *http.Request) {
 		ScopeList: scopeList,
 	}
 
-	RenderTemplate(w, r, "auth_grant", 200, authScreenStruct)
+	renderTemplate(w, r, "authGrant", 200, authScreenStruct)
 }
 
-// NotFound presents the 404 screen to the user
-func NotFound(w http.ResponseWriter, r *http.Request) {
-	RenderTemplate(w, r, "404", 404, nil)
+// showNotFound presents the 404 screen to the user
+func showNotFound(w http.ResponseWriter, r *http.Request) {
+	renderTemplate(w, r, "404", 404, nil)
 }
 
-// ErrorTemplate defines the set of parameters required to show an error page
-type ErrorTemplate struct {
-	Title string
-	Desc  string
+// showError presents the error screen to the user
+func showError(w http.ResponseWriter, r *http.Request, status int, title string, desc string) {
+	renderTemplate(w, r, "error", status, struct {
+		Title string
+		Desc  string
+	}{Title: title, Desc: desc})
 }
 
-// Error presents the error screen to the user
-func Error(w http.ResponseWriter, r *http.Request, status int, errTmpl ErrorTemplate) {
-	RenderTemplate(w, r, "error", status, errTmpl)
+func showJSONError(w http.ResponseWriter, r *http.Request, status int, msg string) {
+	body, err := json.Marshal(struct {
+		Error string
+	}{Error: msg})
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprintln(w, "An error occurred while processing your request.")
+		return
+	}
+
+	w.WriteHeader(status)
+	w.Header().Add("Content-Type", "application/json;charset=UTF-8")
+	fmt.Fprintf(w, string(body))
 }
 
-// RenderTemplate renders the template with the given template, sets the status code for the response
-func RenderTemplate(w http.ResponseWriter, r *http.Request, templateName string, status int, data interface{}) {
+// renderTemplate renders the template with the given template, sets the status code for the response
+func renderTemplate(w http.ResponseWriter, r *http.Request, templateName string, status int, data interface{}) {
 	template, err := template.ParseFiles(fmt.Sprintf("public/templates/%s.html", templateName))
 	if err != nil {
 		panic(err)
@@ -47,4 +61,25 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, templateName string,
 
 	w.WriteHeader(status)
 	template.Execute(w, data)
+}
+
+// parseParams parses a URL string containing application/x-www-urlencoded
+// parameters and returns a map of string key-value pairs of the same
+func parseParams(url string) (map[string]string, error) {
+	var queries string
+	if strings.Contains(url, "?") {
+		queries = strings.Split(url, "?")[1]
+	} else if strings.Contains(url, "&") {
+		queries = url
+	} else {
+		return nil, fmt.Errorf("%s contains no key-value pairs", url)
+	}
+
+	pairs := make(map[string]string)
+	for _, pair := range strings.Split(string(queries), "&") {
+		items := strings.Split(pair, "=")
+		pairs[items[0]] = items[1]
+	}
+
+	return pairs, nil
 }
