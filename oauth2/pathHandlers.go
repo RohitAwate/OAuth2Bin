@@ -8,7 +8,7 @@ import (
 
 // Routes the request to a AuthorizationHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
-	var handler authorizationHandler
+	var handler flowHandler
 	switch r.URL.Query().Get("response_type") {
 	case "code":
 		handler = &authCodeHandler{}
@@ -73,10 +73,10 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var handler tokenHandler
+	var handler flowHandler
 	switch params["grant_type"] {
 	case "authorization_code":
-		handler = &authCodeTokenHandler{}
+		handler = &authCodeHandler{}
 	default:
 		showJSONError(w, r, 400, "grant_type is required")
 		return
