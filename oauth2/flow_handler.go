@@ -21,9 +21,14 @@ type AuthCodeHandler struct {
 func (h *AuthCodeHandler) HandleGrant(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 
-	if queryParams.Get("redirect_uri") == "" && queryParams.Get("client_id") == "" {
+	redirectURI := queryParams.Get("redirect_uri")
+	clientID := queryParams.Get("client_id")
+
+	if redirectURI == "" && clientID == "" {
 		Error(w, r, 400, ErrorTemplate{Title: "Bad Request", Desc: "redirect_uri and client_id are required"})
-	} else {
+	} else if clientID == serverConfig.AuthCodeCnfg.ClientID {
 		PresentAuthScreen(w, r)
+	} else {
+		Error(w, r, 401, ErrorTemplate{Title: "Unauthorized", Desc: "Invalid client_id"})
 	}
 }
