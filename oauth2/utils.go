@@ -47,8 +47,8 @@ func showJSONError(w http.ResponseWriter, r *http.Request, status int, msg strin
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
 	w.WriteHeader(status)
-	w.Header().Add("Content-Type", "application/json;charset=UTF-8")
 	fmt.Fprintf(w, string(body))
 }
 
@@ -66,17 +66,16 @@ func renderTemplate(w http.ResponseWriter, r *http.Request, templateName string,
 // parseParams parses a URL string containing application/x-www-urlencoded
 // parameters and returns a map of string key-value pairs of the same
 func parseParams(url string) (map[string]string, error) {
-	var queries string
 	if strings.Contains(url, "?") {
-		queries = strings.Split(url, "?")[1]
-	} else if strings.Contains(url, "&") {
-		queries = url
-	} else {
+		url = strings.Split(url, "?")[1]
+	}
+
+	if !strings.Contains(url, "&") {
 		return nil, fmt.Errorf("%s contains no key-value pairs", url)
 	}
 
 	pairs := make(map[string]string)
-	for _, pair := range strings.Split(string(queries), "&") {
+	for _, pair := range strings.Split(string(url), "&") {
 		items := strings.Split(pair, "=")
 		pairs[items[0]] = items[1]
 	}

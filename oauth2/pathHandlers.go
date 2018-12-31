@@ -25,7 +25,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 // and redirects the user-agent to that URI.
 func handleAccepted(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		showError(w, r, 400, "Bad Request", r.Method+" not allowed.")
+		showError(w, r, 405, "Bad Request", r.Method+" not allowed.")
 		return
 	}
 
@@ -54,7 +54,7 @@ func handleAccepted(w http.ResponseWriter, r *http.Request) {
 // Returns a JSON object containing the access_token, refresh_token, token_type, expires_in
 func handleToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		showJSONError(w, r, 400, r.Method+" not allowed.")
+		showJSONError(w, r, 405, r.Method+" not allowed.")
 		return
 	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
 		showJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
