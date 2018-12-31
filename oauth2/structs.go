@@ -22,3 +22,8 @@ type OA2Config struct {
 	AuthCodeCnfg AuthCodeConfig
 	ImplicitCnfg ImplicitConfig
 }
+
+type requestError struct {
+	Error string `json:"error"`
+	Desc  string `json:"error_description"`
+}

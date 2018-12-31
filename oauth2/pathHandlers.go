@@ -47,17 +47,19 @@ func handleAccepted(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
 }
 
+// Redirects the request to the appropriate flowHandler by checking the 'grant_type' parameter.
+// Refer RFC 6749 Section 4.1.3 (https://tools.ietf.org/html/rfc6749#section-4.1.3)
 // Accepts only POST requests with application/x-www-form-urlencoded body.
-// Parses the body, verifies if client_id, grant_type, code and redirect_uri parameters are present.
-// Refer: RFC 6749 Section 4.1.3 (https://tools.ietf.org/html/rfc6749#section-4.1.3)
-
-// Returns a JSON object containing the access_token, refresh_token, token_type, expires_in
 func handleToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		showJSONError(w, r, 405, r.Method+" not allowed.")
+		showJSONError(w, r, 405, struct {
+			Error string `json:"error"`
+		}{Error: r.Method + " not allowed."})
 		return
 	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
-		showJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
+		showJSONError(w, r, 400, struct {
+			Error string `json:"error"`
+		}{Error: "Invalid Content-Type: " + r.Header.Get("Content-Type")})
 		return
 	}
 
@@ -82,5 +84,5 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	handler.grant(w, r, params)
+	handler.issueToken(w, r, params)
 }

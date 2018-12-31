@@ -20,7 +20,7 @@ func NewOA2Server(port int, config OA2Config) *OA2Server {
 	return &OA2Server{Port: port, Config: config}
 }
 
-// Start listening for requests
+// Start sets up the static file server, handling routes and then starts listening for requests
 func (s *OA2Server) Start() {
 	public := http.FileServer(http.Dir("public/"))
 	http.Handle("/public/", http.StripPrefix("/public/", public))

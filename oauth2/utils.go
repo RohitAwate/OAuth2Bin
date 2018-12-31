@@ -37,10 +37,8 @@ func showError(w http.ResponseWriter, r *http.Request, status int, title string,
 	}{Title: title, Desc: desc})
 }
 
-func showJSONError(w http.ResponseWriter, r *http.Request, status int, msg string) {
-	body, err := json.Marshal(struct {
-		Error string
-	}{Error: msg})
+func showJSONError(w http.ResponseWriter, r *http.Request, status int, data interface{}) {
+	body, err := json.Marshal(data)
 	if err != nil {
 		w.WriteHeader(500)
 		fmt.Fprintln(w, "An error occurred while processing your request.")
