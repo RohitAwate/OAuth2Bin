@@ -1,9 +1,11 @@
 package store
 
 import (
-	"encoding/base64"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"time"
 )
 
@@ -45,7 +47,40 @@ func NewAuthCodeToken(code, clientID string) (string, error) {
 // The resultant string is Base64 encoded to generate the refreshToken which in turn is Base64 encoded
 // to generate the access token.
 func generateTokens(code, clientID string, creationTime time.Time) (accessToken, refreshToken string) {
-	refreshToken = base64.StdEncoding.EncodeToString([]byte(code + clientID + creationTime.String()))
-	accessToken = base64.StdEncoding.EncodeToString([]byte(refreshToken))
+	randStr := randomString(16)
+	accessToken = hash(fmt.Sprintf("%s%s%s%s", code, clientID, creationTime.String(), randStr))
+	refreshToken = hash(fmt.Sprintf("%s%s", creationTime, randStr))
 	return
+}
+
+// Hashes the string using SHA-256
+func hash(str string) string {
+	hasher := sha256.New()
+	hasher.Write([]byte(str))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+const src = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+var seeded = false
+
+// Generates a string of given length filled with random bytes
+func randomString(n int) string {
+	if n < 1 {
+		return ""
+	}
+
+	if !seeded {
+		rand.Seed(time.Now().UnixNano())
+		seeded = true
+	}
+
+	b := make([]byte, n)
+	srcLen := int64(len(src))
+
+	for i := range b {
+		b[i] = src[rand.Int63()%srcLen]
+	}
+
+	return string(b)
 }

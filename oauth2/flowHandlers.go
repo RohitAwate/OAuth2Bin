@@ -40,13 +40,15 @@ func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] == "" || params["grant_type"] == "" ||
 		params["redirect_uri"] == "" || params["code"] == "" {
-		showJSONError(w, r, 400, requestError{Error: "invalid_request", Desc: "client_id, grant_type=authorization_code, code and redirect_uri are required."})
+		showJSONError(w, r, 400, requestError{Error: "invalid_request",
+			Desc: "client_id, grant_type=authorization_code, code and redirect_uri are required."})
 		return
 	}
 
 	token, err := store.NewAuthCodeToken(params["code"], params["client_id"])
 	if err != nil {
-		showJSONError(w, r, 400, requestError{Error: "invalid_request", Desc: "The code supplied was used previously. The access token issued with that code has been revoked."})
+		showJSONError(w, r, 400, requestError{Error: "invalid_request",
+			Desc: "The code supplied was used previously. The access token issued with that code has been revoked."})
 		return
 	}
 
