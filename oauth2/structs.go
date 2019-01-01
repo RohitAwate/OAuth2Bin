@@ -2,25 +2,23 @@ package oauth2
 
 // AuthCodeConfig defines the variables required in the OAuth 2.0 Authorization Code flow
 type AuthCodeConfig struct {
-	AuthURL      string
-	TokenURL     string
-	ClientID     string
-	ClientSecret string
-	AuthGrant    string
-	AccessToken  string
+	AuthURL      string `json:"authURL"`
+	TokenURL     string `json:"tokenURL"`
+	ClientID     string `json:"clientID"`
+	ClientSecret string `json:"clientSecret"`
+	AuthGrant    string `json:"authGrant"`
 }
 
 // ImplicitConfig defines the variables required in the OAuth 2.0 Implicit flow
 type ImplicitConfig struct {
-	AuthURL     string
-	ClientID    string
-	AccessToken string
+	AuthURL  string `json:"authURL"`
+	ClientID string `json:"clientID"`
 }
 
 // OA2Config defines the configurations for all the flows in OAuth 2.0
 type OA2Config struct {
-	AuthCodeCnfg AuthCodeConfig
-	ImplicitCnfg ImplicitConfig
+	AuthCodeCnfg AuthCodeConfig `json:"authCode"`
+	ImplicitCnfg ImplicitConfig `json:"implicit"`
 }
 
 // Used as response for failed token requests.

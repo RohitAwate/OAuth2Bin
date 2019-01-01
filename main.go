@@ -1,30 +1,36 @@
 package main
 
 import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+	"os"
+
 	"github.com/RohitAwate/OAuth2Bin/oauth2"
 )
 
 func main() {
-	acc := oauth2.AuthCodeConfig{
-		AuthURL:      "http://localhost:8080/authorize",
-		TokenURL:     "http://localhost:8080/token",
-		ClientID:     "clientID",
-		AuthGrant:    "authGrant",
-		ClientSecret: "clientSecret",
-		AccessToken:  "accessToken",
+	fd, err := os.Open("config.json")
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	ic := oauth2.ImplicitConfig{
-		AuthURL:     "https://localhost:8080/authorize",
-		ClientID:    "clientID",
-		AccessToken: "accessToken",
+	jsonBytes, err := ioutil.ReadAll(fd)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	config := oauth2.OA2Config{
-		AuthCodeCnfg: acc,
-		ImplicitCnfg: ic,
+	fd.Close()
+
+	var config oauth2.OA2Config
+	json.Unmarshal(jsonBytes, &config)
+
+	// Since Heroku allocates a port dynamically
+	var port = os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
 
-	server := oauth2.NewOA2Server(8080, config)
+	server := oauth2.NewOA2Server(port, config)
 	server.Start()
 }

@@ -1,0 +1,10 @@
+{
+	"rootPath": "github.com/RohitAwate/OAuth2Bin",
+	"ignore": "test",
+	"heroku": {
+		"install": [
+			"./..."
+		],
+		"goVersion": "go1.11.4"
+	}
+}
