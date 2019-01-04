@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1920mm"
+   height="800mm"
+   viewBox="0 0 1920 800"
+   version="1.1"
+   id="svg4834"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   sodipodi:docname="banner.svg">
+  <defs
+     id="defs4828">
+    <filter
+       id="filter4802"
+       inkscape:label="Drop Shadow"
+       style="color-interpolation-filters:sRGB">
+      <feFlood
+         id="feFlood4792"
+         result="flood"
+         flood-color="rgb(40,40,40)"
+         flood-opacity="1" />
+      <feComposite
+         id="feComposite4794"
+         result="composite1"
+         operator="in"
+         in2="SourceGraphic"
+         in="flood" />
+      <feGaussianBlur
+         id="feGaussianBlur4796"
+         result="blur"
+         stdDeviation="2"
+         in="composite1" />
+      <feOffset
+         id="feOffset4798"
+         result="offset"
+         dy="1"
+         dx="1" />
+      <feComposite
+         id="feComposite4800"
+         result="composite2"
+         operator="over"
+         in2="offset"
+         in="SourceGraphic" />
+    </filter>
+    <linearGradient
+       id="linearGradient4816"
+       inkscape:collect="always">
+      <stop
+         id="stop4812"
+         offset="0"
+         style="stop-color:#0b738c;stop-opacity:1" />
+      <stop
+         id="stop4814"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4808"
+       inkscape:collect="always">
+      <stop
+         id="stop4804"
+         offset="0"
+         style="stop-color:#1f424b;stop-opacity:0.99607843" />
+      <stop
+         id="stop4806"
+         offset="1"
+         style="stop-color:#7bc1d3;stop-opacity:0.99607843" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient4641"
+       inkscape:collect="always">
+      <stop
+         id="stop4637"
+         offset="0"
+         style="stop-color:#0575e6;stop-opacity:1" />
+      <stop
+         id="stop4639"
+         offset="1"
+         style="stop-color:#021b79;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="250.13097"
+       x2="257.77975"
+       y1="-248.79761"
+       x1="263.82739"
+       id="linearGradient4643"
+       xlink:href="#linearGradient4641"
+       inkscape:collect="always" />
+    <filter
+       id="filter4802-5"
+       inkscape:label="Drop Shadow"
+       style="color-interpolation-filters:sRGB;">
+      <feFlood
+         id="feFlood4792-3"
+         result="flood"
+         flood-color="rgb(40,40,40)"
+         flood-opacity="1" />
+      <feComposite
+         id="feComposite4794-5"
+         result="composite1"
+         operator="in"
+         in2="SourceGraphic"
+         in="flood" />
+      <feGaussianBlur
+         id="feGaussianBlur4796-6"
+         result="blur"
+         stdDeviation="2"
+         in="composite1" />
+      <feOffset
+         id="feOffset4798-2"
+         result="offset"
+         dy="1"
+         dx="1" />
+      <feComposite
+         id="feComposite4800-9"
+         result="composite2"
+         operator="over"
+         in2="offset"
+         in="SourceGraphic" />
+    </filter>
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="-257.49106"
+       x2="261.66965"
+       y1="-66.991043"
+       x1="260.9137"
+       id="linearGradient4810"
+       xlink:href="#linearGradient4808"
+       inkscape:collect="always" />
+    <linearGradient
+       gradientUnits="userSpaceOnUse"
+       y2="-232.92259"
+       x2="258.79178"
+       y1="-154.30354"
+       x1="259.25583"
+       id="linearGradient4818"
+       xlink:href="#linearGradient4816"
+       inkscape:collect="always" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.175"
+     inkscape:cx="3556.8015"
+     inkscape:cy="1690.8237"
+     inkscape:document-units="mm"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1869"
+     inkscape:window-height="1025"
+     inkscape:window-x="51"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata4831">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,503)">
+    <g
+       transform="matrix(1.1871085,0,0,1.1439327,-1.3232768,-136.77667)"
+       id="layer1-2"
+       inkscape:label="Layer 1">
+      <text
+         inkscape:export-ydpi="70.239998"
+         inkscape:export-xdpi="70.239998"
+         id="text817"
+         y="259.465"
+         x="12.846973"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           id="tspan819"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:105.83333588px;font-family:Overpass;-inkscape-font-specification:'Overpass Bold';stroke-width:0.26458332"
+           y="268.82877"
+           x="12.846973"
+           sodipodi:role="line" /></text>
+      <rect
+         ry="50"
+         rx="50"
+         y="-118.50595"
+         x="97.25"
+         height="367.39285"
+         width="317.5"
+         id="rect909"
+         style="fill:url(#linearGradient4643);fill-opacity:1;stroke-width:0.26458332" />
+      <rect
+         ry="10"
+         rx="10"
+         y="-143.72021"
+         x="55.294647"
+         height="76.351196"
+         width="401.41071"
+         id="rect913"
+         style="fill:url(#linearGradient4810);fill-opacity:1;stroke-width:0.26458332" />
+      <rect
+         style="fill:url(#linearGradient4818);fill-opacity:1;stroke-width:0.13622113"
+         id="rect917"
+         width="206.66692"
+         height="39.309528"
+         x="152.66653"
+         y="-189.83331"
+         rx="5.1485152"
+         ry="5.1485152" />
+      <text
+         id="text921"
+         y="21.833345"
+         x="201.08333"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+         xml:space="preserve"><tspan
+           style="stroke-width:0.26458332"
+           y="31.197115"
+           x="201.08333"
+           id="tspan919"
+           sodipodi:role="line" /></text>
+      <text
+         id="text925"
+         y="-0.84523356"
+         x="145.64807"
+         style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;filter:url(#filter4802-5)"
+         xml:space="preserve"><tspan
+           dy="80"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+           y="-0.84523356"
+           x="145.64807"
+           id="tspan923"
+           sodipodi:role="line">OA</tspan><tspan
+           id="tspan927"
+           style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+           y="219.64087"
+           x="145.64807"
+           sodipodi:role="line">2B</tspan></text>
+      <flowRoot
+         style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
+         id="flowRoot4820"
+         xml:space="preserve"><flowRegion
+           id="flowRegion4822"><rect
+             y="69.403877"
+             x="197.14285"
+             height="1745.7142"
+             width="1611.4286"
+             id="rect4824" /></flowRegion><flowPara
+           id="flowPara4826" /></flowRoot>    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="827.0119"
+       y="-93.071411"
+       id="text5652"><tspan
+         sodipodi:role="line"
+         id="tspan5650"
+         x="827.0119"
+         y="-83.707642"
+         style="stroke-width:0.26458332"></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="554.55267"
+       y="-21.825825"
+       id="text5656"><tspan
+         sodipodi:role="line"
+         id="tspan5654"
+         x="554.55267"
+         y="-21.825825"
+         style="font-style:normal;font-variant:normal;font-weight:300;font-stretch:normal;font-size:229.30555725px;font-family:Overpass;-inkscape-font-specification:'Overpass Light';stroke-width:0.26458332"><tspan
+   style="font-size:229.30555725px;fill:#00aad4"
+   id="tspan5658">OAuth</tspan><tspan
+   id="tspan5664"
+   style="font-size:229.30555725px;fill:#006680">2.0</tspan>Bin</tspan></text>
+  </g>
+</svg>
