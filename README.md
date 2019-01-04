@@ -1,4 +1,4 @@
-![banner](public/static/banner.svg)
+![banner](public/static/banner.png)
 
 **OAuth 2.0 Bin** is a test server for the OAuth 2.0 Authorization Framework.
 
