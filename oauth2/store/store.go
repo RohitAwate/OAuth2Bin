@@ -5,15 +5,30 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
-type token struct {
-	AuthGrant    string
-	AccessToken  string
-	RefreshToken string
-	CreationTime time.Time
+var pool redis.Pool
+
+const (
+	authCodeTokensHSET = "OA2Bin_AuthCodeTokens"
+)
+
+// AuthCodeToken represents an OAuth 2.0 access token
+type AuthCodeToken struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+	ExpiresIn    int    `json:"expires_in"`
+
+	// Used only within the store package to verify if it has expired or not
+	authGrant    string
+	creationTime time.Time
+	randomString string
 }
 
 // NewAuthCodeToken issues new access tokens for the Authorization Code flow.
@@ -21,36 +36,50 @@ type token struct {
 // using that grant is revoked and an error is returned.
 // Else, a new token is generated and added to the store.
 // (Refer RFC 6749 Section 4.1.2 https://tools.ietf.org/html/rfc6749#section-4.1.2)
-func NewAuthCodeToken(code, clientID string) (string, error) {
+func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 	creationTime := time.Now()
-	accessToken, refreshToken := generateTokens(code, clientID, creationTime)
-	newToken := token{
-		AuthGrant:    code,
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		CreationTime: creationTime,
+	exists := 1
+
+	var token *AuthCodeToken
+	var err error
+	// Generates a new key if a duplicate is encountered
+	for exists == 1 {
+		token = generateAuthCodeToken(code, clientID, creationTime)
+		token.creationTime = creationTime
+
+		exists, err = redis.Int(pool.Get().Do("HEXISTS", authCodeTokensHSET, token.AccessToken))
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
-	jsonStr, err := json.Marshal(struct {
-		AccessToken  string `json:"access_token"`
-		RefreshToken string `json:"refresh_token"`
-		Expiry       int    `json:"expires_in"`
-	}{AccessToken: newToken.AccessToken, RefreshToken: newToken.RefreshToken, Expiry: 3600})
+	jsonBytes, err := json.Marshal(token)
 	if err != nil {
-		return "", fmt.Errorf("Could not marshal JSON")
+		log.Println(err)
+		return nil, err
 	}
 
-	return string(jsonStr), nil
+	_, err = pool.Get().Do("HSET", authCodeTokensHSET, token.AccessToken, string(jsonBytes))
+	if err != nil {
+		panic(err)
+	}
+
+	return token, nil
 }
 
-// Concatenates the code, clientID and the string representation of the creationTime.
-// The resultant string is Base64 encoded to generate the refreshToken which in turn is Base64 encoded
-// to generate the access token.
-func generateTokens(code, clientID string, creationTime time.Time) (accessToken, refreshToken string) {
-	randStr := randomString(16)
-	accessToken = hash(fmt.Sprintf("%s%s%s%s", code, clientID, creationTime.String(), randStr))
-	refreshToken = hash(fmt.Sprintf("%s%s", creationTime, randStr))
-	return
+// Concatenates the code, the clientID, the string representation of the creationTime and a random string
+// and generates the same code
+func generateAuthCodeToken(code, clientID string, creationTime time.Time) *AuthCodeToken {
+	randStr := generateRandomString(16)
+	accessToken := hash(fmt.Sprintf("%s%s%s%s", code, clientID, creationTime.String(), randStr))
+	refreshToken := hash(fmt.Sprintf("%s%s", creationTime, randStr))
+
+	return &AuthCodeToken{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+		ExpiresIn:    3600,
+		randomString: randStr,
+	}
 }
 
 // Hashes the string using SHA-256
@@ -63,7 +92,7 @@ func hash(str string) string {
 const src = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 // Generates a string of given length filled with random bytes
-func randomString(n int) string {
+func generateRandomString(n int) string {
 	if n < 1 {
 		return ""
 	}
@@ -79,5 +108,31 @@ func randomString(n int) string {
 }
 
 func init() {
+	// Seeding the random package
 	rand.Seed(time.Now().UnixNano())
+
+	// Initializing the connection pool with Redis
+	pool = redis.Pool{
+		MaxActive: 30,
+		MaxIdle:   10,
+		Dial: func() (redis.Conn, error) {
+			var conn redis.Conn
+			var err error
+			if os.Getenv("REDIS_HOST") == "" && os.Getenv("REDIS_PASS") == "" && os.Getenv("REDIS_PORT") == "" {
+				// Defaults to a local Redis server
+				conn, err = redis.Dial("tcp", ":6379")
+			} else {
+				addr := fmt.Sprintf("redis://:%s@%s:%s", os.Getenv("REDIS_PASS"),
+					os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
+				conn, err = redis.DialURL(addr)
+			}
+
+			if err != nil {
+				// Panics if connection could not be established with a Redis server
+				panic(err)
+			}
+
+			return conn, nil
+		},
+	}
 }

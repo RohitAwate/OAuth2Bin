@@ -1,6 +1,7 @@
 package oauth2
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -53,5 +54,7 @@ func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, par
 	}
 
 	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
-	fmt.Fprintln(w, token)
+	jsonBytes, err := json.Marshal(token)
+
+	fmt.Fprintln(w, string(jsonBytes))
 }
