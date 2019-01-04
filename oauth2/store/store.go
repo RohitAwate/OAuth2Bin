@@ -62,17 +62,10 @@ func hash(str string) string {
 
 const src = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-var seeded = false
-
 // Generates a string of given length filled with random bytes
 func randomString(n int) string {
 	if n < 1 {
 		return ""
-	}
-
-	if !seeded {
-		rand.Seed(time.Now().UnixNano())
-		seeded = true
 	}
 
 	b := make([]byte, n)
@@ -83,4 +76,8 @@ func randomString(n int) string {
 	}
 
 	return string(b)
+}
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
 }

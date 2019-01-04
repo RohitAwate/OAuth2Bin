@@ -10,18 +10,6 @@ import (
 )
 
 func main() {
-	fd, err := os.Open("config.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	jsonBytes, err := ioutil.ReadAll(fd)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fd.Close()
-
 	var config oauth2.OA2Config
 	json.Unmarshal(jsonBytes, &config)
 
@@ -33,4 +21,20 @@ func main() {
 
 	server := oauth2.NewOA2Server(port, config)
 	server.Start()
+}
+
+var jsonBytes []byte
+
+func init() {
+	fd, err := os.Open("config.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jsonBytes, err = ioutil.ReadAll(fd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fd.Close()
 }
