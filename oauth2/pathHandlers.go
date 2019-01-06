@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 )
 
 // Routes the request to a AuthorizationHandler based on the request_type
@@ -43,7 +45,7 @@ func handleAccepted(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	redirectURI := msg["redirect_uri"] + "?code=" + serverConfig.AuthCodeCnfg.AuthGrant
+	redirectURI := msg["redirect_uri"] + "?code=" + store.NewAuthCodeGrant()
 	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
 }
 

@@ -6,7 +6,6 @@ type AuthCodeConfig struct {
 	TokenURL     string `json:"tokenURL"`
 	ClientID     string `json:"clientID"`
 	ClientSecret string `json:"clientSecret"`
-	AuthGrant    string `json:"authGrant"`
 }
 
 // ImplicitConfig defines the variables required in the OAuth 2.0 Implicit flow

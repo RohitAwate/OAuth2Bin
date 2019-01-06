@@ -9,17 +9,17 @@ var strLen = 16
 var cases = 1000
 var generated []string
 
-func TestGenerateRandomString(t *testing.T) {
+func TestGenerateNonce(t *testing.T) {
 	generated = make([]string, cases)
 
 	for i := 0; i < cases; i++ {
-		t.Run(fmt.Sprintf("#%d", i), testGenerateRandomStringFunc(strLen, i))
+		t.Run(fmt.Sprintf("#%d", i), testGenerateNonceFunc(strLen, i))
 	}
 }
 
-func testGenerateRandomStringFunc(n, i int) func(*testing.T) {
+func testGenerateNonceFunc(n, i int) func(*testing.T) {
 	return func(t *testing.T) {
-		newStr := generateRandomString(n)
+		newStr := generateNonce(n)
 
 		for j := 0; j < i; j++ {
 			if generated[j] == newStr {

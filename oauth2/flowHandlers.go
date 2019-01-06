@@ -49,7 +49,7 @@ func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, par
 	token, err := store.NewAuthCodeToken(params["code"], params["client_id"])
 	if err != nil {
 		showJSONError(w, r, 400, requestError{Error: "invalid_request",
-			Desc: "The code supplied was used previously. The access token issued with that code has been revoked."})
+			Desc: err.Error()})
 		return
 	}
 
