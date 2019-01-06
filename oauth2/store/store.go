@@ -25,7 +25,7 @@ const (
 	authCodeGrantSet = "OA2Bin_AuthCodeGrant"
 )
 
-// TokenMeta holds the meta data of an access token
+// tokenMeta holds the meta data of an access token
 type tokenMeta struct {
 	AuthGrant    string    `json:"auth_grant"`
 	CreationTime time.Time `json:"creation_time"`
