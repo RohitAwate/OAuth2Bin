@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - "1.11"
+
+script:
+  - cd oauth2 && go test
+  - cd store && go test
