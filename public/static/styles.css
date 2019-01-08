@@ -9,3 +9,63 @@
     display: flex;
     align-items: center;
 }
+
+.final-link {
+    overflow: auto;
+    white-space: nowrap;
+}
+
+.final-link > code {
+    padding: 10px;
+}
+
+@media sceen and (max-width: 400px) {
+    .final-link {
+        width: 100%;
+    }
+}
+
+@media screen and (min-width: 900px) {
+    .content-pane {
+        display: flex;
+        padding: 10px;
+    }
+
+    .left-pane, .right-pane {
+        margin: 10px;
+        float: left;
+        margin-bottom: 10px;
+    }
+
+    .mobile-hr {
+        visibility: visible;
+    }
+
+    .final-link {
+        width: 50%;
+    }
+}
+
+@media screen and (min-width: 1500px) {
+    .content-pane {
+        padding: 50px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .left-pane, .right-pane {
+        float: left;
+    }
+
+    .mobile-hr {
+        visibility: hidden;
+    }
+
+    .final-link {
+        max-width: 40%;
+    }
+
+    .final-link code {
+        padding: 1em;
+    }
+}

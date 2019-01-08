@@ -3,6 +3,8 @@ language: go
 go:
   - "1.11"
 
+services:
+  - redis-server
+
 script:
-  - cd oauth2 && go test
-  - cd store && go test
+  - go test -v ./...

@@ -15,12 +15,13 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-primary col-xs-12">
-        <img src="/public/static/logo.png" alt="logo" style="width: 4%">
+    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
+        <img src="/public/static/logo.png" alt="logo" style="width: 4%; min-width: 70px;">
         <span class="text-white pl-2" style="display: inline; line-height: normal">
             <a href="#" class="navbar-brand font-weight-bold">OAuth 2.0 Bin</a>
             <br>
-            A free, open-source and <a href="https://tools.ietf.org/html/rfc6749"><span class="badge badge-secondary">RFC 6749</span></a> compliant test server for the OAuth 2.0 Authorization Framework.
+            A free, open-source and <a href="https://tools.ietf.org/html/rfc6749"><span class="badge badge-secondary">RFC
+                    6749</span></a> compliant test server for the OAuth 2.0 Authorization Framework.
         </span>
     </nav>
 
@@ -48,52 +49,62 @@
         </ul>
 
         <div class="tab-content">
-            <div id="authCode" class="tab-pane fade active show">
-                <h5 class="text-dark ml-3 mt-4 font-weight-bold">Parameters</h5>
-                <div class="col-md-4 col-xs-10 mt-3">
-                    <dt>Authorization URL</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.AuthURL}}</span>
-                </div>
+            <div id="authCode" class="tab-pane fade active show justify-content-center">
+                <div class="content-pane">
+                    <div class="left-pane">
+                        <h5 class="text-dark mt-3 font-weight-bold">Parameters</h5>
+                        <div class="mt-3">
+                            <dt>Authorization URL</dt>
+                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.AuthURL}}</span>
+                        </div>
 
-                <div class="col-md-4 col-xs-10 mt-3">
-                    <dt>Access Token URL</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.TokenURL}}</span>
-                </div>
+                        <div class="mt-3">
+                            <dt>Access Token URL</dt>
+                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.TokenURL}}</span>
+                        </div>
 
-                <div class="col-md-4 col-xs-10 mt-3">
-                    <dt>Client ID</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientID}}</span>
-                </div>
+                        <div class="mt-3">
+                            <dt>Client ID</dt>
+                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientID}}</span>
+                        </div>
 
-                <div class="col-md-4 col-xs-10 mt-3">
-                    <dt>Client Secret</dt>
-                    <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientSecret}}</span>
-                </div>
+                        <div class="mt-3">
+                            <dt>Client Secret</dt>
+                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientSecret}}</span>
+                        </div>
+                    </div>
 
-                <hr class="col-md-4 col-xs-12 float-left">
+                    <hr class="mobile-hr">
 
-                <h5 class="text-dark ml-3 mt-5 font-weight-bold">Authorization Grant Request</h5>
-                <p class="text-monospace bg-secondary d-inline p-1 ml-3 rounded col-md-4 col-xs-12">
-                    {{.AuthCodeCnfg.AuthURL}}?response_type=code&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
-                </p>
-                <div class="col-md-4 col-xs-12 mt-4">
-                    <span class="font-weight-bold badge-dark rounded p-1 text-monospace">response_type=code</span>
-                    <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
-                    <p class="mt-1 text-muted">Indicates that the application is requesting for an authorization grant
-                        token.</p>
-                </div>
+                    <div class="right-pane">
+                        <h5 class="text-dark mt-3 font-weight-bold">Authorization Grant Request</h5>
+                        <div class="final-link">
+                            <code class="bg-secondary">
+                                {{.AuthCodeCnfg.AuthURL}}?response_type=code&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
+                            </code>
+                        </div>
+                        <div class="col-xs-12 mt-4">
+                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">response_type=code</span>
+                            <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
+                            <p class="mt-1 text-muted">Indicates that the application is requesting for an
+                                authorization grant
+                                token.</p>
+                        </div>
 
-                <div class="col-md-4 col-xs-12 mt-3">
-                    <span class="font-weight-bold badge-dark rounded p-1 text-monospace">redirect_uri=...</span>
-                    <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
-                    <p class="mt-1 text-muted">Redirects the user-agent to this address when the authorization is
-                        complete.</p>
-                </div>
+                        <div class="col-xs-12 mt-3">
+                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">redirect_uri=...</span>
+                            <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
+                            <p class="mt-1 text-muted">Redirects the user-agent to this address when the authorization
+                                is
+                                complete.</p>
+                        </div>
 
-                <div class="col-md-4 col-xs-12 mt-3">
-                    <span class="font-weight-bold badge-dark rounded p-1 text-monospace">scope=...</span>
-                    <span class="badge-secondary font-weight-bold rounded ml-2 p-1">optional</span>
-                    <p class="mt-1 text-muted">You can show your creativity here as the server ignores this.</p>
+                        <div class="col-xs-12 mt-3">
+                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">scope=...</span>
+                            <span class="badge-secondary font-weight-bold rounded ml-2 p-1">optional</span>
+                            <p class="mt-1 text-muted">You can show your creativity here as the server ignores this.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div id="implicit" class="tab-pane fade">
@@ -107,7 +118,6 @@
             </div>
         </div>
     </div>
-    <script async defer src="https://buttons.github.io/buttons.js"></script>
 </body>
 
 </html>
