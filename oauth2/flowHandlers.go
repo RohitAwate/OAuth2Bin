@@ -26,11 +26,12 @@ func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	clientID := queryParams.Get("client_id")
 
-	if clientID == "" {
+	switch clientID {
+	case "":
 		showError(w, r, 400, "Bad Request", "client_id is required")
-	} else if clientID == serverConfig.AuthCodeCnfg.ClientID {
+	case serverConfig.AuthCodeCnfg.ClientID:
 		presentAuthScreen(w, r)
-	} else {
+	default:
 		showError(w, r, 401, "Unauthorized", "Invalid client_id")
 	}
 }

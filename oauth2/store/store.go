@@ -19,10 +19,10 @@ var pool redis.Pool
 
 const (
 	// Redis HSET which holds the issued tokens
-	authCodeTokensSet = "OA2Bin_AuthCodeTokens"
+	authCodeTokensSet = "OA2B_AC_Tokens"
 
 	// Redis SET which holds the issued grants until a token request is made.
-	authCodeGrantSet = "OA2Bin_AuthCodeGrant"
+	authCodeGrantSet = "OA2B_AC_Grants"
 )
 
 // tokenMeta holds the meta data of an access token
@@ -47,7 +47,9 @@ type AuthCodeToken struct {
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
 func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
-	reply, _ := redis.Int(pool.Get().Do("HEXISTS", authCodeGrantSet, code))
+	conn := pool.Get()
+	defer conn.Close()
+	reply, _ := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
 
 	// If not found in the Redis cache, there are three possibilites:
 	// - A token was already issued on this. The previously-issued token must be revoked.
@@ -58,7 +60,7 @@ func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 	}
 
 	// If found, check if it has expired since housekeeping runs only every 5 minutes
-	intTime, _ := redis.Int64(pool.Get().Do("HGET", authCodeGrantSet, code))
+	intTime, _ := redis.Int64(conn.Do("HGET", authCodeGrantSet, code))
 	issueTime := time.Unix(intTime, 0)
 	if time.Now().Sub(issueTime) >= 10*time.Minute {
 		return nil, fmt.Errorf("expired authorization grant")
@@ -75,7 +77,7 @@ func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 	// Generates a new key if a duplicate is encountered
 	for reply == 1 {
 		token, meta = generateAuthCodeToken(code, clientID)
-		reply, _ = redis.Int(pool.Get().Do("HEXISTS", authCodeTokensSet, token.AccessToken))
+		reply, _ = redis.Int(conn.Do("HEXISTS", authCodeTokensSet, token.AccessToken))
 	}
 
 	jsonBytes, err := json.Marshal(struct {
@@ -86,7 +88,7 @@ func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 		panic(err)
 	}
 
-	_, err = pool.Get().Do("HSET", authCodeTokensSet, token.AccessToken, string(jsonBytes))
+	_, err = conn.Do("HSET", authCodeTokensSet, token.AccessToken, string(jsonBytes))
 	if err != nil {
 		panic(err)
 	}
@@ -100,20 +102,26 @@ func NewAuthCodeGrant() string {
 	reply := 0
 
 	// In case we get a duplicate value, we iterate until we get a unique one.
+	conn := pool.Get()
+	defer conn.Close()
 	for reply == 0 {
 		code = generateNonce(20)
-		reply, _ = redis.Int(pool.Get().Do("HSET", authCodeGrantSet, code, time.Now().Unix()))
+		reply, _ = redis.Int(conn.Do("HSET", authCodeGrantSet, code, time.Now().Unix()))
 	}
 
 	return code
 }
 
 func removeGrant(code string) {
-	pool.Get().Do("HDEL", authCodeGrantSet, code)
+	conn := pool.Get()
+	defer conn.Close()
+	conn.Do("HDEL", authCodeGrantSet, code)
 }
 
 func invalidateToken(accessToken string) {
-	pool.Get().Do("HDEL", authCodeTokensSet, accessToken)
+	conn := pool.Get()
+	defer conn.Close()
+	conn.Do("HDEL", authCodeTokensSet, accessToken)
 }
 
 // Generates access and refresh tokens.
@@ -175,7 +183,11 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 	var token tokenStruct
 	var err error
 	var diff time.Duration
-	items, _ := redis.ByteSlices(pool.Get().Do("HGETALL", authCodeTokensSet))
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
 
 	for i := 1; i < len(items); i += 2 {
 		err = json.Unmarshal(items[i], &token)
@@ -186,7 +198,7 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 
 		diff = time.Now().Sub(token.Meta.CreationTime)
 		if diff >= time.Hour {
-			pool.Get().Do("HDEL", authCodeTokensSet, items[i-1])
+			conn.Do("HDEL", authCodeTokensSet, items[i-1])
 		}
 	}
 }
@@ -196,12 +208,16 @@ func grantHousekeep(wg *sync.WaitGroup) {
 
 	var intTime int64
 	var issueTime time.Time
-	grants, _ := redis.Strings(pool.Get().Do("HGETALL", authCodeGrantSet))
+
+	conn := pool.Get()
+	defer conn.Close()
+
+	grants, _ := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
 	for i := 0; i < len(grants); i += 2 {
 		intTime, _ = strconv.ParseInt(grants[i], 10, 64)
 		issueTime = time.Unix(intTime, 0)
 		if time.Now().Sub(issueTime) >= time.Hour {
-			pool.Get().Do("HDEL", authCodeGrantSet, grants[i])
+			conn.Do("HDEL", authCodeGrantSet, grants[i])
 		}
 	}
 }
