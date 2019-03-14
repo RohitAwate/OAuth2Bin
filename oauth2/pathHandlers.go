@@ -1,7 +1,6 @@
 package oauth2
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"net/http"
 
@@ -11,12 +10,16 @@ import (
 // Routes the request to a AuthorizationHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
 	var handler flowHandler
+	params := r.URL.Query()
+
+	if params.Get("response_type") == "" || params.Get("client_id") == "" || params.Get("redirect_uri") == "" {
+		showError(w, r, 400, "Bad Request", "response_type, client_id and redirect_uri are required.")
+		return
+	}
+
 	switch r.URL.Query().Get("response_type") {
 	case "code":
 		handler = &authCodeHandler{}
-	default:
-		showError(w, r, 400, "Bad Request", "response_type is required")
-		return
 	}
 
 	handler.handleAuth(w, r)
@@ -25,27 +28,21 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 // Invoked by the Authorization Grant screen when the user accepts the authorization request.
 // Extracts the redirect_uri from the JSON body, attaches an authorization grant to it,
 // and redirects the user-agent to that URI.
-func handleAccepted(w http.ResponseWriter, r *http.Request) {
+func handleResponse(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		showError(w, r, 405, "Bad Request", r.Method+" not allowed.")
 		return
 	}
 
-	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
-	if err != nil {
-		showError(w, r, 400, "Bad Request", "Could not read body of request.")
-		return
+	response := r.FormValue("response")
+	redirectURI := r.FormValue("redirectURI")
+
+	if response == "ACCEPT" {
+		redirectURI += "?code=" + store.NewAuthCodeGrant()
+	} else if response == "CANCEL" {
+		redirectURI += "?error=access_denied"
 	}
 
-	var msg map[string]string
-	err = json.Unmarshal(body, &msg)
-	if err != nil {
-		showError(w, r, 400, "Bad Request", "Invalid JSON found in request body.")
-		return
-	}
-
-	redirectURI := msg["redirect_uri"] + "?code=" + store.NewAuthCodeGrant()
 	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
 }
 

@@ -17,7 +17,7 @@
 
 <body>
     <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-        <a href="#" class="navbar-brand">OAuth 2.0 Bin</a>
+        <a href="/" class="navbar-brand">OAuth 2.0 Bin</a>
     </nav>
 
     <div class="vertical-center">
@@ -32,11 +32,12 @@
                 </ul>
             </div>
             <hr>
-            <div class="text-center">
+            <form class="text-center" action="/response" method="POST">
                 <p class="text-muted">By clicking 'Accept', you agree that you are awesome.</p>
-                <button class="btn btn-dark" id="cancelBtn" type="submit">CANCEL</button>
-                <button class="btn btn-primary" id="acceptBtn" type="submit">ACCEPT</button>
-            </div>
+                <input type="text" name="redirectURI" id="redirectURI" hidden>
+                <input class="btn btn-dark" name="response" value="CANCEL" id="cancelBtn" type="submit">
+                <input class="btn btn-primary" name="response" value="ACCEPT" id="acceptBtn" type="submit">
+            </form>
         </div>
     </div>
     <script src="/public/static/authGrant.js"></script>

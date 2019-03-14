@@ -36,7 +36,7 @@ func (s *OA2Server) Start() {
 	})
 
 	http.HandleFunc("/authorize", handleAuth)
-	http.HandleFunc("/accepted", handleAccepted)
+	http.HandleFunc("/response", handleResponse)
 	http.HandleFunc("/token", handleToken)
 	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
 	http.ListenAndServe(":"+s.Port, nil)
