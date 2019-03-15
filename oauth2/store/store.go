@@ -5,11 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"log"
 	"math/rand"
 	"os"
-	"strconv"
-	"sync"
 	"time"
 
 	"github.com/gomodule/redigo/redis"
@@ -172,56 +169,6 @@ func generateNonce(n int) string {
 	return string(b)
 }
 
-func tokenHousekeep(wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	type tokenStruct struct {
-		Token AuthCodeToken
-		Meta  tokenMeta
-	}
-
-	var token tokenStruct
-	var err error
-	var diff time.Duration
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
-
-	for i := 1; i < len(items); i += 2 {
-		err = json.Unmarshal(items[i], &token)
-		if err != nil {
-			log.Println(err)
-			break
-		}
-
-		diff = time.Now().Sub(token.Meta.CreationTime)
-		if diff >= time.Hour {
-			conn.Do("HDEL", authCodeTokensSet, items[i-1])
-		}
-	}
-}
-
-func grantHousekeep(wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	var intTime int64
-	var issueTime time.Time
-
-	conn := pool.Get()
-	defer conn.Close()
-
-	grants, _ := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
-	for i := 0; i < len(grants); i += 2 {
-		intTime, _ = strconv.ParseInt(grants[i], 10, 64)
-		issueTime = time.Unix(intTime, 0)
-		if time.Now().Sub(issueTime) >= time.Hour {
-			conn.Do("HDEL", authCodeGrantSet, grants[i])
-		}
-	}
-}
-
 func init() {
 	// Seeding the random package
 	rand.Seed(time.Now().UnixNano())
@@ -250,18 +197,4 @@ func init() {
 			return conn, nil
 		},
 	}
-
-	// Background goroutine that fires the housekeeping function every
-	// 5 minutes for cleaning up expired grants and tokens.
-	go func() {
-		timer := time.NewTimer(5 * time.Minute)
-		wg := sync.WaitGroup{}
-		for {
-			wg.Add(2)
-			go tokenHousekeep(&wg)
-			go grantHousekeep(&wg)
-			wg.Wait()
-			<-timer.C
-		}
-	}()
 }
