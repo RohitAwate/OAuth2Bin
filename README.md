@@ -3,13 +3,15 @@
 **OAuth 2.0 Bin** is a test server for the OAuth 2.0 Authorization Framework.
 
 # Features
-- [RFC 6749](https://tools.ietf.org/html/rfc6749) compliant
+- [RFC 6749](https://tools.ietf.org/html/rfc6749) compliant _(mostly)_
 - Persists to Redis
 - Uses predefined parameters in requests (`client_id`, `client_secret`)
 - Dynamic access token generation
 - Configurable using a single JSON file
 - Written in Go
 - No dependencies except [redigo](https://github.com/gomodule/redigo)
+
+![banner](public/static/home.jpg)
 
 # Motivation
 The motivation behind creating this was the lack of easily accessible OAuth 2.0 servers while testing [Everest](https://github.com/RohitAwate/Everest).
