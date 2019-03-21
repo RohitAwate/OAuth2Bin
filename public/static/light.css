@@ -1,0 +1,211 @@
+* {
+    font-family: Arial, Helvetica, sans-serif;
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    background-color: white;
+}
+
+a {
+    text-decoration: none;
+}
+
+nav {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    background-color: white;
+}
+
+.img-responsive {
+    width: 4%;
+    height: auto;
+    min-width: 60px;
+}
+
+#logo {
+    margin-right: 5px;
+}
+
+#titleText {
+    color: #545454;
+}
+
+.info {
+    color: #747474;
+}
+
+.info > a {
+    font-family: monospace;
+    color: inherit;
+    font-size: 1.1em;
+    font-weight: bolder;
+}
+
+.info > a:hover {
+    color: orangered;
+}
+
+.flow-card {
+    margin: 10px;
+    background-color: #eee;
+    border-radius: 10px;
+}
+
+.card-header {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.flow-card:hover {
+    background-color: #b2f0e9;
+}
+
+.card-title {
+    font-weight: normal;
+    margin: 10px;
+    color: #949494;
+    letter-spacing: 1px;
+}
+
+.container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.accordion-arrow {
+    width: 30px;
+    cursor: pointer;
+}
+
+.accordion-pane {
+    color: white;
+    display: none;
+    margin-top: 30px;
+}
+
+.accordion-head:target .accordion-pane {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.accordion-head:target {
+    background-color: #3f6fad;
+}
+
+.accordion-head:target .card-header {
+    background-color: #374e6b;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.accordion-head:target .card-header .card-title,
+.accordion-head:target .accordion-pane {
+    color: #eaeaea;
+}
+
+dl {
+    padding-top: 10px;
+    font-size: 1.1em;
+    flex-wrap: wrap;
+}
+
+dt {
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.copy {
+    cursor: pointer;
+}
+
+.left-pane {
+    margin-right: 30px;
+}
+
+.middle-pane {
+    margin: 0 30px;
+}
+
+.right-pane {
+    margin-left: 30px;
+}
+
+.left-pane dl dd {
+    margin-top: 2px;
+    padding: 5px;
+    background-color: #5f90cf;
+    border-radius: 5px;
+    font-size: 1.3em;
+    font-family: monospace;
+}
+
+.reqd-badge {
+    padding: 1px 3px;
+    background-color: orangered;
+    border-radius: 3px;
+}
+
+.opt-badge {
+    padding: 1px 3px;
+    background-color: #9a9a9a;
+    border-radius: 3px;
+}
+
+.middle-pane dl dt span {
+    margin-right: 10px;
+    font-family: monospace;
+    font-size: 1.3em;
+    padding: 1px 3px;
+    background-color: #5f90cf;
+    border-radius: 3px;
+}
+
+.middle-pane dl dd {
+    margin-top: 5px;
+    font-size: 1.1em;
+}
+
+.right-pane ul {
+    margin-top: 20px;
+    list-style-type: circle;
+}
+
+.right-pane ul li {
+    padding: 5px;
+    font-size: 1.2em;
+}
+
+.code-link {
+    overflow-x: auto;
+    font-size: 1.3em;
+    font-family: monospace;
+    margin-top: 3px;
+    padding: 5px;
+    border-radius: 5px;
+    background-color: #5f90cf;
+}
+
+.final-url {
+    text-align: center;
+    padding: 30px 10px;
+}
+
+@media screen and (max-width: 1800px) {
+    .right-pane {
+        margin-top: 50px;
+    }
+}
+
+@media screen and (max-width: 1080px) {
+    .middle-pane {
+        margin-top: 50px;
+    }
+}

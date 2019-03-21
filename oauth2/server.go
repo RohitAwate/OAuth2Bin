@@ -27,12 +27,19 @@ func (s *OA2Server) Start() {
 	http.Handle("/public/", http.StripPrefix("/public/", public))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		template, err := template.ParseFiles("public/templates/index.html")
+		tmpl, err := template.ParseFiles(
+			"public/templates/index.html",
+			"public/templates/base.html",
+			"public/templates/cards.html",
+		)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
-		template.Execute(w, s.Config)
+		err = tmpl.ExecuteTemplate(w, "home", s.Config)
+		if err != nil {
+			log.Fatal(err)
+		}
 	})
 
 	http.HandleFunc("/authorize", handleAuth)

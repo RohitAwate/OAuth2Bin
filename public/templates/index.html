@@ -1,123 +1,22 @@
+{{ define "home" }}
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" href="/public/static/styles.css">
-    <script src="/public/static/index.js"></script>
     <title>OAuth 2.0 Bin</title>
+    <link rel="stylesheet" href="/public/static/light.css">
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-        <img src="/public/static/logo.png" alt="logo" style="width: 4%; min-width: 70px;">
-        <span class="text-white pl-2" style="display: inline; line-height: normal">
-            <a href="#" class="navbar-brand font-weight-bold">OAuth 2.0 Bin</a>
-            <br>
-            A free, open-source and <a href="https://tools.ietf.org/html/rfc6749"><span class="badge badge-secondary">RFC
-                    6749</span></a> compliant test server for the OAuth 2.0 Authorization Framework.
-        </span>
-    </nav>
-
-    <div class="container-fluid">
-        <div id="intro" class="p-1 mt-3">
-            <p>
-                We have defined a static parameters that you must use while making your request. These are detailed
-                below, based on the flow you wish to follow.
-            </p>
-        </div>
-
-        <ul class="nav nav-tabs mt-1 col-md-12 col-xs-12 justify-content-center">
-            <li class="nav-item">
-                <a class="nav-link active" data-toggle="tab" href="#authCode">Authorization Code</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#implicit">Implicit</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#ropc">Resource Owner Password Credentials</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" data-toggle="tab" href="#clientCreds">Client Credentials</a>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div id="authCode" class="tab-pane fade active show justify-content-center">
-                <div class="content-pane">
-                    <div class="left-pane">
-                        <h5 class="text-dark mt-3 font-weight-bold">Parameters</h5>
-                        <div class="mt-3">
-                            <dt>Authorization URL</dt>
-                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.AuthURL}}</span>
-                        </div>
-
-                        <div class="mt-3">
-                            <dt>Access Token URL</dt>
-                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.TokenURL}}</span>
-                        </div>
-
-                        <div class="mt-3">
-                            <dt>Client ID</dt>
-                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientID}}</span>
-                        </div>
-
-                        <div class="mt-3">
-                            <dt>Client Secret</dt>
-                            <span class="badge-primary text-white text-monospace text-decoration-none rounded cursor-pointer copy p-1">{{.AuthCodeCnfg.ClientSecret}}</span>
-                        </div>
-                    </div>
-
-                    <hr class="mobile-hr">
-
-                    <div class="right-pane">
-                        <h5 class="text-dark mt-3 font-weight-bold">Authorization Grant Request</h5>
-                        <div class="final-link">
-                            <code class="bg-secondary">
-                                {{.AuthCodeCnfg.AuthURL}}?response_type=code&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
-                            </code>
-                        </div>
-                        <div class="col-xs-12 mt-4">
-                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">response_type=code</span>
-                            <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
-                            <p class="mt-1 text-muted">Indicates that the application is requesting for an
-                                authorization grant
-                                token.</p>
-                        </div>
-
-                        <div class="col-xs-12 mt-3">
-                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">redirect_uri=...</span>
-                            <span class="badge-danger font-weight-bold rounded ml-2 p-1">required</span>
-                            <p class="mt-1 text-muted">Redirects the user-agent to this address when the authorization
-                                is
-                                complete.</p>
-                        </div>
-
-                        <div class="col-xs-12 mt-3">
-                            <span class="font-weight-bold badge-dark rounded p-1 text-monospace">scope=...</span>
-                            <span class="badge-secondary font-weight-bold rounded ml-2 p-1">optional</span>
-                            <p class="mt-1 text-muted">You can show your creativity here as the server ignores this.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id="implicit" class="tab-pane fade">
-
-            </div>
-            <div id="ropc" class="tab-pane fade">
-
-            </div>
-            <div id="clientCreds" class="tab-pane fade">
-
-            </div>
-        </div>
-    </div>
+    {{ template "nav" }}
+    {{ template "auth-code" . }}
+    {{ template "implicit" . }}
+    {{ template "ropc" . }}
+    {{ template "clientCreds" . }}
+    <script src="/public/static/index.js"></script>
 </body>
-
 </html>
+
+{{ end }}
