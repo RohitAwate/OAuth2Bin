@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"time"
@@ -42,7 +43,7 @@ type AuthCodeToken struct {
 // If crossed, an error is thrown.
 // Else a new token is generated and returned.
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
-func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
+func NewAuthCodeToken(code string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
 	conn := pool.Get()
 	defer conn.Close()
@@ -73,7 +74,7 @@ func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 
 	// Generates a new key if a duplicate is encountered
 	for reply == 1 {
-		token, meta = generateAuthCodeToken(code, clientID)
+		token, meta = generateAuthCodeToken(code)
 		reply, _ = redis.Int(conn.Do("HEXISTS", authCodeTokensSet, token.AccessToken))
 	}
 
@@ -87,7 +88,18 @@ func NewAuthCodeToken(code, clientID string) (*AuthCodeToken, error) {
 
 	_, err = conn.Do("HSET", authCodeTokensSet, token.AccessToken, string(jsonBytes))
 	if err != nil {
-		panic(err)
+		return nil, err
+	}
+
+	return token, nil
+}
+
+// NewRefreshToken returns
+func NewRefreshToken(refreshToken string) (*AuthCodeToken, error) {
+	code := NewAuthCodeGrant()
+	token, err := NewAuthCodeToken(code)
+	if err != nil {
+		return nil, err
 	}
 
 	return token, nil
@@ -109,6 +121,37 @@ func NewAuthCodeGrant() string {
 	return code
 }
 
+// RefreshTokenExists checks if the refresh token exists in the Redis cache
+// and returns the appropriate boolean value.
+// Params:
+// refreshToken: the token to look for in the cache
+// invalidateIfFound: if true, the token is invalidated if found
+func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
+	conn := pool.Get()
+	defer conn.Close()
+
+	var token tokenStruct
+	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+
+	for i := 1; i < len(items); i += 2 {
+		err := json.Unmarshal(items[i], &token)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		if refreshToken == token.Token.RefreshToken {
+			if invalidateIfFound {
+				invalidateToken(token.Token.AccessToken)
+			}
+
+			return true
+		}
+	}
+
+	return false
+}
+
 func removeGrant(code string) {
 	conn := pool.Get()
 	defer conn.Close()
@@ -123,14 +166,14 @@ func invalidateToken(accessToken string) {
 
 // Generates access and refresh tokens.
 // Access Token is a hex-encoded string of the SHA-256 hash of the concatenation of
-// the code, client ID, time of creation and a nonce.
+// the code, time of creation and a nonce.
 // Refresh Token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // time of creation and the same nonce as above.
-func generateAuthCodeToken(code, clientID string) (*AuthCodeToken, *tokenMeta) {
+func generateAuthCodeToken(code string) (*AuthCodeToken, *tokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
-	accessToken := hash(fmt.Sprintf("%s%s%s%s", code, clientID, creationTime, nonce))
+	accessToken := hash(fmt.Sprintf("%s%s%s", code, creationTime, nonce))
 	refreshToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
 
 	return &AuthCodeToken{

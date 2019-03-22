@@ -42,15 +42,19 @@ func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] == "" || params["grant_type"] == "" ||
 		params["redirect_uri"] == "" || params["code"] == "" {
-		showJSONError(w, r, 400, requestError{Error: "invalid_request",
-			Desc: "client_id, grant_type=authorization_code, code and redirect_uri are required."})
+		showJSONError(w, r, 400, requestError{
+			Error: "invalid_request",
+			Desc:  "client_id, grant_type=authorization_code, code and redirect_uri are required.",
+		})
 		return
 	}
 
-	token, err := store.NewAuthCodeToken(params["code"], params["client_id"])
+	token, err := store.NewAuthCodeToken(params["code"])
 	if err != nil {
-		showJSONError(w, r, 400, requestError{Error: "invalid_request",
-			Desc: err.Error()})
+		showJSONError(w, r, 400, requestError{
+			Error: "invalid_request",
+			Desc:  err.Error(),
+		})
 		return
 	}
 
@@ -58,4 +62,37 @@ func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, par
 	jsonBytes, err := json.Marshal(token)
 
 	fmt.Fprintln(w, string(jsonBytes))
+}
+
+// Refer RFC 6749 Section 6 (https://tools.ietf.org/html/rfc6749#section-6)
+func handleRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	if params["refresh_token"] == "" {
+		showJSONError(w, r, 400, requestError{
+			Error: "invalid_request",
+			Desc:  "refresh_token required",
+		})
+		return
+	}
+
+	// If found, invalidate previously issued token
+	if store.RefreshTokenExists(params["refresh_token"], true) {
+		token, err := store.NewRefreshToken(params["refresh_token"])
+		if err != nil {
+			showJSONError(w, r, 500, requestError{
+				Error: "could not generate token",
+				Desc:  err.Error(),
+			})
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		jsonBytes, err := json.Marshal(token)
+
+		fmt.Fprintln(w, string(jsonBytes))
+	} else {
+		showJSONError(w, r, 400, requestError{
+			Error: "invalid refresh_token",
+			Desc:  "expired or invalid refresh token",
+		})
+	}
 }

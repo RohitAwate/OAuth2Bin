@@ -10,13 +10,13 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
+type tokenStruct struct {
+	Token AuthCodeToken
+	Meta  tokenMeta
+}
+
 func tokenHousekeep(wg *sync.WaitGroup) {
 	defer wg.Done()
-
-	type tokenStruct struct {
-		Token AuthCodeToken
-		Meta  tokenMeta
-	}
 
 	var token tokenStruct
 	var err error

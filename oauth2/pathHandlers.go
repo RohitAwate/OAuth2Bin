@@ -78,6 +78,9 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	switch params["grant_type"] {
 	case "authorization_code":
 		handler = &authCodeHandler{}
+	case "refresh_token":
+		handleRefresh(w, r, params)
+		return
 	default:
 		showJSONError(w, r, 400, "grant_type is required")
 		return

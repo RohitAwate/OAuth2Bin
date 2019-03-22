@@ -30,3 +30,20 @@ func testGenerateNonceFunc(n, i int) func(*testing.T) {
 		generated[i] = newStr
 	}
 }
+
+func TestRefreshTokenExists(t *testing.T) {
+	code := NewAuthCodeGrant()
+	token, err := NewAuthCodeToken(code)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	exists := RefreshTokenExists(token.RefreshToken, true)
+
+	if exists {
+		t.Log("found refresh token")
+	} else {
+		removeGrant(code)
+		t.Fatal("failed to find refresh token")
+	}
+}
