@@ -44,10 +44,22 @@ func showNotFound(w http.ResponseWriter, r *http.Request) {
 
 // showError presents the error screen to the user
 func showError(w http.ResponseWriter, r *http.Request, status int, title string, desc string) {
-	renderTemplate(w, r, "error", status, struct {
+	tmpl, err := template.ParseFiles(
+		"public/templates/error.html",
+		"public/templates/base.html",
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	w.WriteHeader(status)
+	err = tmpl.ExecuteTemplate(w, "error", struct {
 		Title string
 		Desc  string
 	}{Title: title, Desc: desc})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func showJSONError(w http.ResponseWriter, r *http.Request, status int, data interface{}) {

@@ -80,6 +80,15 @@ nav {
     flex-wrap: wrap;
 }
 
+.container-vertical {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    height: 75vh;
+}
+
 .accordion-arrow {
     width: 30px;
     cursor: pointer;

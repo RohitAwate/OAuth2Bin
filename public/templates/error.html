@@ -1,3 +1,5 @@
+{{ define "error" }}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,28 +8,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Error | OAuth 2.0 Bin</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-        crossorigin="anonymous">
-    <link rel="stylesheet" href="/public/static/styles.css">
+    <link rel="stylesheet" href="/public/static/light.css">
+    <style>
+        body {
+            background-color: #c71c22;
+            color: white;
+        }
+
+        #titleStr {
+            font-size: 5em;
+            font-weight: lighter;
+        }
+
+        #descStr {
+            font-family: monospace;
+            font-weight: lighter;
+        }
+
+        img {
+            max-width: 10%;
+        }
+    </style>
 </head>
-
-<body class="bg-danger">
-    <nav class="navbar navbar-expand-md navbar-dark">
-        <a href="/" class="navbar-brand">OAuth 2.0 Bin</a>
-    </nav>
-</body>
-<div class="vertical-center">
-    <div class="container text-center">
-        <div class="col-md">
-            <i class="fas fa-exclamation-triangle text-white mb-4 display-1"></i>
-            <h1 class="display-1 text-white">{{ .Title }}</h1>
-            <h1 class="h1 text-monospace font-weight-light">{{ .Desc }}</h1>
-        </div>
+<body>
+    {{ template "nav" . }}
+    <div class="container-vertical">
+        <img src="/public/static/warning.png" alt="warning-symbol">
+        <h1 id="titleStr">{{ .Title }}</h1>
+        <h1 id="descStr">{{ .Desc }}</h1>
     </div>
-</div>
-
+</body>
 </html>
+
+{{ end }}

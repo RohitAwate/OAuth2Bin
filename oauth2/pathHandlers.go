@@ -30,7 +30,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 // and redirects the user-agent to that URI.
 func handleResponse(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		showError(w, r, 405, "Bad Request", r.Method+" not allowed.")
+		showError(w, r, 405, "Method Not Allowed", r.Method+" not allowed.")
 		return
 	}
 
