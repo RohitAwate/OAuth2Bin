@@ -1,13 +1,13 @@
 {
     "authCode": {
-        "authURL": "http://localhost:8080/authorize",
-        "tokenURL": "http://localhost:8080/token",
+        "authURL": "https://oauth2bin.herokuapp.com/authorize",
+        "tokenURL": "https://oauth2bin.herokuapp.com/token",
         "clientID": "clientID",
         "clientSecret": "clientSecret",
         "authGrant": "authGrant"
     },
     "implicit": {
-        "authURL": "http://localhost:8080/authorize",
+        "authURL": "https://oauth2bin.herokuapp.com/authorize",
         "clientID": "clientID"
     }
 }
