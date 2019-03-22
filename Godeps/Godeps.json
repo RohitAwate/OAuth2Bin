@@ -1,0 +1,15 @@
+{
+	"ImportPath": "github.com/RohitAwate/OAuth2Bin",
+	"GoVersion": "go1.11",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/gomodule/redigo/redis",
+			"Comment": "v2.0.0-8-g02dc273",
+			"Rev": "02dc2736dbc3a4a56907b0d5a9fead2f71b499db"
+		}
+	]
+}
