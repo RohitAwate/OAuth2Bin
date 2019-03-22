@@ -37,11 +37,6 @@ func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// showNotFound presents the 404 screen to the user
-func showNotFound(w http.ResponseWriter, r *http.Request) {
-	renderTemplate(w, r, "404", 404, nil)
-}
-
 // showError presents the error screen to the user
 func showError(w http.ResponseWriter, r *http.Request, status int, title string, desc string) {
 	tmpl, err := template.ParseFiles(
