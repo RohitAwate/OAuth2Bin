@@ -10,6 +10,7 @@ body {
 
 a {
     text-decoration: none;
+    color: inherit;
 }
 
 nav {
@@ -197,6 +198,49 @@ dt {
     text-align: center;
     padding: 30px 10px;
 }
+
+/* authGrant.html */
+
+#grant-form {
+    margin: 30px;
+    text-align: center;
+    color: #747474;
+}
+
+#grant-form h1 {
+    font-weight: lighter;
+    margin: 10px;
+}
+
+#grant-form ul {
+    margin: 20px 0px;
+}
+
+#grant-form li {
+    list-style-type: none;
+    background-color: #eee;
+    padding: 10px 100px;
+    margin: 1px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: none;
+    margin: 20px 0px;
+}
+
+#cancel-btn {
+    background-color: #404040;
+    color: white;
+}
+
+#accept-btn {
+    background-color: #3281e7;
+    color: white;
+}
+
+/* Responsive */
 
 @media screen and (max-width: 1800px) {
     .right-pane {

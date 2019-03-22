@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -11,8 +12,9 @@ import (
 // presentAuthScreen shows the authorization screen to the user
 func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
 	scopeList := []string{
-		"Go to Mars",
+		"Fly to Mars",
 		"Travel back in time",
+		"Ride a dragon",
 	}
 
 	authScreenStruct := struct {
@@ -21,7 +23,18 @@ func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
 		ScopeList: scopeList,
 	}
 
-	renderTemplate(w, r, "authGrant", 200, authScreenStruct)
+	tmpl, err := template.ParseFiles(
+		"public/templates/authGrant.html",
+		"public/templates/base.html",
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = tmpl.ExecuteTemplate(w, "auth", authScreenStruct)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // showNotFound presents the 404 screen to the user

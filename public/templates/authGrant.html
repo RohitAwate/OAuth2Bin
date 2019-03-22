@@ -1,3 +1,5 @@
+{{ define "auth" }}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,41 +8,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Authorize the application | OAuth 2.0 Bin</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
-        crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://bootswatch.com/4/cerulean/bootstrap.min.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-    integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-    <link rel="stylesheet" href="/public/static/styles.css">
+    <link rel="stylesheet" href="/public/static/light.css">
+    <style>
+        #rocket {
+            max-width: 10%;
+            min-width: 200px;
+            margin: 30px;
+        }
+    </style>
 </head>
-
 <body>
-    <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-        <a href="/" class="navbar-brand">OAuth 2.0 Bin</a>
-    </nav>
+    {{ template "nav" . }}
 
-    <div class="vertical-center">
-        <div class="text-center container col-md-4">
-            <i class="fa fa-rocket mb-5 text-primary" style="font-size: 10em"></i>
-            <h1>The application would like to</h1>
-            <div class="p-3 rounded">
-                <ul class="list-group">
-                    {{ range .ScopeList }}
-                    <li class="list-group-item bg-secondary text-left">{{ . }}</li>
-                    {{ end }}
-                </ul>
-            </div>
-            <hr>
-            <form class="text-center" action="/response" method="POST">
-                <p class="text-muted">By clicking 'Accept', you agree that you are awesome.</p>
-                <input type="text" name="redirectURI" id="redirectURI" hidden>
-                <input class="btn btn-dark" name="response" value="CANCEL" id="cancelBtn" type="submit">
-                <input class="btn btn-primary" name="response" value="ACCEPT" id="acceptBtn" type="submit">
-            </form>
+    <div id="grant-form">
+        <img src="/public/static/svg/logo.svg" alt="rocket" id="rocket">
+        <h1>OAuth 2.0 Bin would like to</h1>
+        <div class="container">
+            <ul>
+                {{ range .ScopeList }}
+                <li>{{ . }}</li>
+                {{ end }}
+            </ul>
         </div>
+        <form action="/response" method="POST">
+            <p>By clicking 'Accept', you agree that you are awesome.</p>
+            <input type="text" name="redirectURI" id="redirectURI" hidden>
+            <input name="response" value="CANCEL" class="btn" id="cancel-btn" type="submit">
+            <input name="response" value="ACCEPT" class="btn" id="accept-btn" type="submit">
+        </form>
     </div>
     <script src="/public/static/authGrant.js"></script>
 </body>
 
 </html>
+
+{{ end }}
