@@ -3,6 +3,9 @@ package middleware
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
+	"github.com/gomodule/redigo/redis"
 )
 
 // Policy represents the rate limiting policy
@@ -50,6 +53,7 @@ func (rl *RateLimiter) CheckLimit(handler http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
+// Searches the policies based on the route
 func (rl *RateLimiter) getPolicy(route string) *Policy {
 	for _, policy := range rl.Policies {
 		if route == policy.Route {
@@ -58,6 +62,29 @@ func (rl *RateLimiter) getPolicy(route string) *Policy {
 	}
 
 	return nil
+}
+
+// Registers a new hit for the route from the IP in Redis.
+// Returns the current hit count or an error.
+func setHit(policy *Policy, ip string) (int, error) {
+	conn := cache.NewConn()
+	defer conn.Close()
+
+	key := fmt.Sprintf("%s:%s", policy.Route, ip)
+	res, err := redis.String(conn.Do("GET", key))
+
+	// if key exists, increment
+	if err == nil {
+		return redis.Int(conn.Do("INCR", key))
+		// else, set key with value 1 and set TTL according to policy
+	} else if res == "" && err == redis.ErrNil {
+		res, err = redis.String(conn.Do("SET", key, 1, "EX", policy.PeriodMin*60))
+		if res == "OK" {
+			return 1, nil
+		}
+	}
+
+	return -1, nil
 }
 
 func showError(w http.ResponseWriter, r *http.Request) {
