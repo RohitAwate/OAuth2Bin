@@ -1,0 +1,17 @@
+[
+    {
+        "route": "/authorize",
+        "limit": 10,
+        "period": 30
+    },
+    {
+        "route": "/response",
+        "limit": 10,
+        "period": 60
+    },
+    {
+        "route": "/token",
+        "limit": 5,
+        "period": 60
+    }
+]

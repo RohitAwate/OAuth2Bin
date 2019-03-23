@@ -4,12 +4,15 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+
+	"github.com/RohitAwate/OAuth2Bin/oauth2/middleware"
 )
 
 // OA2Server implements an OAuth 2.0 server
 type OA2Server struct {
-	Port   string
-	Config OA2Config
+	Port    string
+	Config  OA2Config
+	Limiter middleware.RateLimiter
 }
 
 var serverConfig OA2Config
@@ -19,6 +22,12 @@ var serverConfig OA2Config
 func NewOA2Server(port string, config OA2Config) *OA2Server {
 	serverConfig = config
 	return &OA2Server{Port: port, Config: config}
+}
+
+// SetRateLimiter creates a new RateLimiter which enforces
+// the policies passed.
+func (s *OA2Server) SetRateLimiter(policies []middleware.Policy) {
+	s.Limiter = middleware.RateLimiter{Policies: policies}
 }
 
 // Start sets up the static file server, handling routes and then starts listening for requests
@@ -42,9 +51,9 @@ func (s *OA2Server) Start() {
 		}
 	})
 
-	http.HandleFunc("/authorize", handleAuth)
-	http.HandleFunc("/response", handleResponse)
-	http.HandleFunc("/token", handleToken)
+	http.HandleFunc("/authorize", s.Limiter.CheckLimit(handleAuth))
+	http.HandleFunc("/response", s.Limiter.CheckLimit(handleResponse))
+	http.HandleFunc("/token", s.Limiter.CheckLimit(handleToken))
 	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
 	http.ListenAndServe(":"+s.Port, nil)
 }

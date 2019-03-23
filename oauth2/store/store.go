@@ -7,13 +7,11 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
-	"os"
 	"time"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
-
-var pool redis.Pool
 
 const (
 	// Redis HSET which holds the issued tokens
@@ -45,7 +43,7 @@ type AuthCodeToken struct {
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
 func NewAuthCodeToken(code string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 	reply, _ := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
 
@@ -111,7 +109,7 @@ func NewAuthCodeGrant() string {
 	reply := 0
 
 	// In case we get a duplicate value, we iterate until we get a unique one.
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 	for reply == 0 {
 		code = generateNonce(20)
@@ -127,7 +125,7 @@ func NewAuthCodeGrant() string {
 // refreshToken: the token to look for in the cache
 // invalidateIfFound: if true, the token is invalidated if found
 func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 
 	var token tokenStruct
@@ -153,13 +151,13 @@ func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 }
 
 func removeGrant(code string) {
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 	conn.Do("HDEL", authCodeGrantSet, code)
 }
 
 func invalidateToken(accessToken string) {
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 	conn.Do("HDEL", authCodeTokensSet, accessToken)
 }
@@ -215,29 +213,4 @@ func generateNonce(n int) string {
 func init() {
 	// Seeding the random package
 	rand.Seed(time.Now().UnixNano())
-
-	// Initializing the connection pool with Redis
-	pool = redis.Pool{
-		MaxActive: 30,
-		MaxIdle:   10,
-		Dial: func() (redis.Conn, error) {
-			var conn redis.Conn
-			var err error
-			if os.Getenv("REDIS_HOST") == "" && os.Getenv("REDIS_PASS") == "" && os.Getenv("REDIS_PORT") == "" {
-				// Defaults to a local Redis server
-				conn, err = redis.Dial("tcp", ":6379")
-			} else {
-				addr := fmt.Sprintf("redis://:%s@%s:%s", os.Getenv("REDIS_PASS"),
-					os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
-				conn, err = redis.DialURL(addr)
-			}
-
-			if err != nil {
-				// Panics if connection could not be established with a Redis server
-				panic(err)
-			}
-
-			return conn, nil
-		},
-	}
 }

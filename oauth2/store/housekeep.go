@@ -7,6 +7,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -22,7 +23,7 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 	var err error
 	var diff time.Duration
 
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 
 	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
@@ -47,7 +48,7 @@ func grantHousekeep(wg *sync.WaitGroup) {
 	var intTime int64
 	var issueTime time.Time
 
-	conn := pool.Get()
+	conn := cache.NewConn()
 	defer conn.Close()
 
 	grants, _ := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
