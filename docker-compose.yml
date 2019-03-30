@@ -1,0 +1,14 @@
+version: '2'
+
+services:
+  web:
+    build: .
+    environment:
+      - DOCKER=1
+    ports:
+      - "8080:8080"
+    links:
+      - redis
+
+  redis:
+    image: redis:alpine3.9

@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gomodule/redigo/redis"
@@ -22,18 +23,25 @@ func init() {
 		Dial: func() (redis.Conn, error) {
 			var conn redis.Conn
 			var err error
-			if os.Getenv("REDIS_HOST") == "" && os.Getenv("REDIS_PASS") == "" && os.Getenv("REDIS_PORT") == "" {
-				// Defaults to a local Redis server
+
+			if os.Getenv("DOCKER") != "" {
+				// Uses the Redis container if running within Docker
+				conn, err = redis.DialURL("redis://redis:6379")
+				log.Println("RedisServer: Docker")
+			} else if os.Getenv("REDIS_HOST") == "" && os.Getenv("REDIS_PASS") == "" && os.Getenv("REDIS_PORT") == "" {
+				// Else defaults to a local Redis server
 				conn, err = redis.Dial("tcp", ":6379")
+				log.Println("RedisServer: Local")
 			} else {
 				addr := fmt.Sprintf("redis://:%s@%s:%s", os.Getenv("REDIS_PASS"),
 					os.Getenv("REDIS_HOST"), os.Getenv("REDIS_PORT"))
 				conn, err = redis.DialURL(addr)
+				log.Println("RedisServer: " + os.Getenv("REDIS_HOST"))
 			}
 
 			if err != nil {
 				// Panics if connection could not be established with a Redis server
-				panic(err)
+				log.Fatal(err)
 			}
 
 			return conn, nil

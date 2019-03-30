@@ -7,11 +7,10 @@
 - Persists to Redis
 - Uses predefined parameters in requests (`client_id`, `client_secret`)
 - Dynamic access token generation
-- Configurable using a single JSON file
+- IP-based rate limiting
+- Configurable with JSON
 - Written in Go
 - No dependencies except [redigo](https://github.com/gomodule/redigo)
-
-![banner](public/static/home.jpg)
 
 # Motivation
 The motivation behind creating this was the lack of easily accessible OAuth 2.0 servers while testing [Everest](https://github.com/RohitAwate/Everest).
@@ -32,8 +31,8 @@ and does away with the complexity that a 'real' library/server would bring, whic
 - Providing binaries and Docker images
 - Deploying to https://oauth2bin.org for everyone to use this as a service _(not yet bought)_
 
-# Building from source
-### Build pre-requisites
+# Standard Installation 
+### Pre-requisites
 - Go 1.11
 - Redis 4
 
@@ -43,8 +42,11 @@ _Older versions should also work, not tested though._
 # Get the repo
 go get -u github.com/RohitAwate/OAuth2Bin
 
-# Open the cloned repo
+# Enter the cloned repo
 cd $GOPATH/src/github.com/RohitAwate/OAuth2Bin
+
+# Run tests
+go test ./...
 
 # Run without building a binary
 go run main.go
@@ -56,5 +58,65 @@ go build -o bin/OA2Bin && bin/OA2Bin
 go install && OAuth2Bin
 ```
 
+This will use a local Redis server, by default. Optionally, if you want to connect to a remote Redis server, specify the `REDIS_HOST`, `REDIS_PASS` and `REDIS_PORT` environment variables and OA2B will automatically pick them up.
+
+# Docker
+Docker Compose is used to run the server and Redis in separate containers.
+
+### Pre-requisites
+- Docker
+- Docker Compose
+
+```bash
+# Clone the repo
+git clone https://github.com/RohitAwate/OAuth2Bin
+
+# Enter the directory
+cd OAuth2Bin/
+
+# Build and run the containers
+docker-compose up
+
+# Run containers in the background
+docker-compose up -d
+
+# Stop background containers
+docker-compose stop
+```
+
+# Configuring the server
+### Endpoints and Credentials
+OA2B uses the `config/server.json` file for setting the server endpoints and client credentials. It is included in the Git repository. Make the necessary changes before deployment.
+
+It expects separate configurations for every OAuth 2.0 flow in the form of JSON objects. The following parameters are required:
+
+- Authorization Code
+    - `authURL` Authorization endpoint URL
+    - `tokenURL` Access Token endpoint URL
+    - `clientID` OA2B uses a single client ID for all requests
+    - `clientSecret` OA2B uses a single client secret for all requests
+
+### Rate Limiting
+OA2B allows you to configure IP-based rate limiting on a per-route basis. The policies can be specified in the `config/policy.json` file. It is included in the Git repository. Make the necessary changes before deployment.
+
+If a policy is not provided for a certain route, OA2B doesn't impose any default limits and will thu allow all traffic.
+
+The following parameters are required in every policy, which in turn is specified as a JSON object.
+
+- `route` The route to apply the policy to
+- `limit` Maximum number of requests permitted within a period
+- `period` Time period in minutes over which the limit is imposed
+
+#### Example 
+```json
+{
+    "route": "/example",
+    "limit": 100,
+    "period": 30
+}
+
+// For the /example route, allow 100 requests per 30 minutes per IP address
+```
+
 # License
-OAuth 2.0 Bin is licensed under the [MIT License](LICENSE).
+OAuth 2.0 Bin is licensed under the [MIT License](LICENSE)

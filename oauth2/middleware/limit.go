@@ -13,7 +13,7 @@ import (
 //
 // Route: the server route to apply the policy to
 // Limit: the number of API calls allowed
-// Period: the duration over which the Limit is imposed
+// PeriodMin: the duration over which the Limit is imposed
 type Policy struct {
 	Route     string `json:"route"`
 	Limit     int    `json:"limit"`
@@ -46,7 +46,7 @@ func (rl *RateLimiter) CheckLimit(handler http.HandlerFunc) http.HandlerFunc {
 		}
 
 		if hits > policy.Limit {
-			showError(w, r)
+			showError(policy, w, r)
 		} else {
 			handler.ServeHTTP(w, r)
 		}
@@ -87,6 +87,7 @@ func setHit(policy *Policy, ip string) (int, error) {
 	return -1, nil
 }
 
-func showError(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "You have exceeded the rate limit on this route")
+func showError(policy *Policy, w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusTooManyRequests)
+	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minutes on this route.\n", policy.Limit, policy.PeriodMin)
 }

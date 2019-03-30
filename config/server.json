@@ -3,8 +3,7 @@
         "authURL": "https://oauth2bin.herokuapp.com/authorize",
         "tokenURL": "https://oauth2bin.herokuapp.com/token",
         "clientID": "clientID",
-        "clientSecret": "clientSecret",
-        "authGrant": "authGrant"
+        "clientSecret": "clientSecret"
     },
     "implicit": {
         "authURL": "https://oauth2bin.herokuapp.com/authorize",
