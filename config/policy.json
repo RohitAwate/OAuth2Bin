@@ -13,5 +13,10 @@
         "route": "/token",
         "limit": 5,
         "period": 60
+    },
+    {
+        "route": "/echo",
+        "limit": 50,
+        "period": 30
     }
 ]

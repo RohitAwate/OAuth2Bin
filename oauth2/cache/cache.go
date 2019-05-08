@@ -10,7 +10,7 @@ import (
 
 var pool redis.Pool
 
-// NewConn returns a Redis connection
+// NewConn returns a Redis connection.
 // It is the responsibility of the receiver to close the connection.
 func NewConn() redis.Conn {
 	return pool.Get()

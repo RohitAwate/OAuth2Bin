@@ -99,7 +99,7 @@ It expects separate configurations for every OAuth 2.0 flow in the form of JSON 
 ### Rate Limiting
 OA2B allows you to configure IP-based rate limiting on a per-route basis. The policies can be specified in the `config/policy.json` file. It is included in the Git repository. Make the necessary changes before deployment.
 
-If a policy is not provided for a certain route, OA2B doesn't impose any default limits and will thu allow all traffic.
+If a policy is not provided for a certain route, OA2B doesn't impose any default limits and will thus allow all traffic.
 
 The following parameters are required in every policy, which in turn is specified as a JSON object.
 

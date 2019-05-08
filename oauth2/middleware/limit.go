@@ -27,9 +27,9 @@ type RateLimiter struct {
 	Policies []Policy
 }
 
-// CheckLimit checks if the client is within the limits enforced by the policies
+// Handle checks if the client is within the limits enforced by the policies
 // and returns the appropriate boolean value.
-func (rl *RateLimiter) CheckLimit(handler http.HandlerFunc) http.HandlerFunc {
+func (rl *RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		policy := rl.getPolicy(r.URL.Path)
 		if policy == nil {
@@ -64,6 +64,7 @@ func (rl *RateLimiter) getPolicy(route string) *Policy {
 	return nil
 }
 
+// TODO: try to use goroutines for Redis calls
 // Registers a new hit for the route from the IP in Redis.
 // Returns the current hit count or an error.
 func setHit(policy *Policy, ip string) (int, error) {
@@ -89,5 +90,5 @@ func setHit(policy *Policy, ip string) (int, error) {
 
 func showError(policy *Policy, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTooManyRequests)
-	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minutes on this route.\n", policy.Limit, policy.PeriodMin)
+	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minute(s) on this route.\n", policy.Limit, policy.PeriodMin)
 }

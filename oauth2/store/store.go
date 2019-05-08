@@ -129,7 +129,10 @@ func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	defer conn.Close()
 
 	var token tokenStruct
-	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+	if err != nil {
+		log.Println(err)
+	}
 
 	for i := 1; i < len(items); i += 2 {
 		err := json.Unmarshal(items[i], &token)
@@ -148,6 +151,16 @@ func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	}
 
 	return false
+}
+
+// VerifyToken checks if the token exists in the Redis cache.
+// Returns true if token found, false otherwise.
+func VerifyToken(token string) bool {
+	conn := cache.NewConn()
+	defer conn.Close()
+
+	_, err := redis.String(conn.Do("HGET", authCodeTokensSet, token))
+	return err == nil
 }
 
 func removeGrant(code string) {

@@ -1,7 +1,10 @@
 package oauth2
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
@@ -87,4 +90,84 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	handler.issueToken(w, r, params)
+}
+
+type echoResponse struct {
+	Method      string `json:"method"`
+	HTTPVersion string `json:"httpVersion"`
+
+	Body           string            `json:"body"`
+	QueryParams    map[string]string `json:"queryParams"`
+	URLEncodedForm map[string]string `json:"urlencodedForm"`
+	MultipartForm  map[string]string `json:"mutipartForm"`
+
+	Headers map[string]string `json:"headers"`
+	Origin  string            `json:"origin"`
+}
+
+// [Auth Not Required] handleEcho echoes the request in the response body as JSON
+func handleEcho(w http.ResponseWriter, r *http.Request) {
+	// Generate response
+	response := echoResponse{
+		Method:      r.Method,
+		HTTPVersion: fmt.Sprintf("%d.%d", r.ProtoMajor, r.ProtoMinor),
+		Origin:      r.RemoteAddr,
+	}
+
+	response.Headers = make(map[string]string)
+	for key, val := range r.Header {
+		response.Headers[key] = val[0]
+	}
+
+	params := r.URL.Query()
+	if len(params) > 0 {
+		response.QueryParams = make(map[string]string)
+		for key, val := range params {
+			response.QueryParams[key] = val[0]
+		}
+	}
+
+	// Parses application/x-www-form-urlencoded body
+	// only for POST, PATCH and PUT requests
+	// Since we are only interested in these request bodies,
+	// we check if the length of the PostForm is greater than zero.
+	r.ParseForm()
+	if len(r.PostForm) > 0 {
+		response.URLEncodedForm = make(map[string]string)
+		for key, val := range r.PostForm {
+			response.URLEncodedForm[key] = val[0]
+		}
+	}
+
+	r.ParseMultipartForm(1024)
+	if r.MultipartForm != nil {
+		response.MultipartForm = make(map[string]string)
+		// Add string key-value pairs
+		for key, val := range r.MultipartForm.Value {
+			response.MultipartForm[key] = val[0]
+		}
+
+		// Add the file key-value pairs. The name of the file is used as value
+		for key, val := range r.MultipartForm.File {
+			response.MultipartForm[key] = fmt.Sprintf("%s (%dB)", val[0].Filename, val[0].Size)
+		}
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Println(err)
+	} else {
+		response.Body = string(body)
+	}
+
+	jsonStr, err := json.Marshal(response)
+	if err != nil {
+		log.Println(err)
+		showJSONError(w, r, 500, struct {
+			Error string `json:"error"`
+		}{Error: "Error while processing request"})
+	}
+
+	w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+	fmt.Fprintln(w, string(jsonStr))
 }

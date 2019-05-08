@@ -51,9 +51,11 @@ func (s *OA2Server) Start() {
 		}
 	})
 
-	http.HandleFunc("/authorize", s.Limiter.CheckLimit(handleAuth))
-	http.HandleFunc("/response", s.Limiter.CheckLimit(handleResponse))
-	http.HandleFunc("/token", s.Limiter.CheckLimit(handleToken))
+	http.HandleFunc("/authorize", s.Limiter.Handle(handleAuth))
+	http.HandleFunc("/response", s.Limiter.Handle(handleResponse))
+	http.HandleFunc("/token", s.Limiter.Handle(handleToken))
+	http.HandleFunc("/echo", s.Limiter.Handle(handleEcho))
+
 	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
 	http.ListenAndServe(":"+s.Port, nil)
 }
