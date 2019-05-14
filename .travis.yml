@@ -6,7 +6,7 @@ language: go
 go:
 - '1.11'
 services:
-- redis-server
+- if [ "$TRAVIS_OS_NAME" != "osx" ] ; redis-server; fi
 before_script:
 - if [ "$TRAVIS_OS_NAME" == "osx" ] ; then brew update; brew install redis; fi
 script:
