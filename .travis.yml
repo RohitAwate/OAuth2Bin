@@ -11,6 +11,7 @@ addons:
   homebrew:
     packages: redis
 script:
+- if [ "$TRAVIS_OS_NAME" == "linux" ] ; then systemcl start redis; fi
 - go test ./...
 - go build -o bin/oa2b-${TRAVIS_OS_NAME}
 deploy:
