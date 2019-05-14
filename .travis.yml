@@ -8,6 +8,8 @@ go:
 services:
 - redis-server
 script:
+if: os = osx
+brew install redis
 - go test ./...
 - go build -o bin/oa2b-${TRAVIS_OS_NAME}
 deploy:
