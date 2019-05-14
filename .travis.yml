@@ -1,10 +1,16 @@
 language: go
-
 go:
-  - "1.11"
-
+- '1.11'
 services:
-  - redis-server
-
+- redis-server
 script:
-  - go test ./...
+- go test ./...
+- go build -o bin/oa2b
+deploy:
+  provider: releases
+  api_key:
+    secure: FvQ8qjChX+g5ILICoKbE8KYjiAgJYqtMZhjei9nG1xZxo2PAY1qzUg3vSfBHPBYwGqzUmDy0C5cIS/D8D/bYFmRbmAxjIXpCf+riojkclzCBd7boDbZ2rVBBTpDXpLkur9dfTXe8DaGxHZ+sviQ6JlpIXM7eanhbS2o+2+NuMyQnP57uOlUpdATiXPqjs31rpXPxJSlHYonYuZu4qsqY4T08Gdc5VvYeq1/2n0bQqllam68l8y0ZIfpg68RtfY2LhaB9e+C0XyRJ5XD61T+hvDm8c0Zw1qHhpv9dSxTA3peUzNHs4rfXrDPWOylUSKX5jpWFZ2CH0p7WkgAHPFjEYp3b1W7A2IjVLAlUvjLmHQHrk1lTUrrwIYS26SiaBUcMSDZhmpLMHrGx0oPA2kWcBRrbXEuTMoTc4UxveOajB7cSTvqfUKbxxHcveRWhC/yKBa5axlDtj6RDfNqupNH+PiBsgkqWi6DeVnkl2p72mmEqPDK+TSV3CfLAKZ2U16MbKejbO5i/ZV7Ry+U9g4J9rwHpj4gEYhm6NeKraLkbcAFRuAbsrtHwqE+JLsDptPbNaJITevGwfaQmuQ0IB4zUecO8hmjvThmxYCMZBn5fS8cZV9bG2FG+TGnMfd4owoWUyOeEm09rPsIWZ8xc+iwbnDvEsREfQsyLjvaV+KU69c8=
+  file: bin/oa2b
+  on:
+    repo: RohitAwate/OAuth2Bin
+    branch: travis-test
