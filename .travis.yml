@@ -13,6 +13,5 @@ deploy:
   file: bin/oa2b
   skip_cleanup: true
   on:
-    tags: true
     repo: RohitAwate/OAuth2Bin
     branch: travis-test
