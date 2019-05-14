@@ -7,9 +7,9 @@ go:
 - '1.11'
 services:
 - redis-server
+before_script:
+- if [ "$TRAVIS_OS_NAME" == "osx" ] ; then brew update; brew install redis; fi
 script:
-if: os = osx
- brew install redis
 - go test ./...
 - go build -o bin/oa2b-${TRAVIS_OS_NAME}
 deploy:
