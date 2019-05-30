@@ -30,7 +30,7 @@
                     <dd>Your client ID.</dd>
                 </dl>
                 <dl>
-                    <dt><span>redirect_uri=...</span><strong class="reqd-badge">required</strong></dt>
+                    <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
                     <dd>Redirects the user-agent to this address when the authorization is complete.</dd>
                 </dl>
                 <dl>
@@ -70,16 +70,62 @@
 {{ end }}
 
 {{ define "implicit" }}
-    <a href="#implicitCard">
-        <div class="flow-card accordion-head" id="implicitCard">
+    <div class="flow-card accordion-head" id="implicitCard">
+        <a href="#implicitCard">
             <div class="card-header">
                 <h2 class="card-title">Implicit</h2>
             </div>
-            <div class="accordion-pane">
-                <h2 style="margin-bottom: 20px;">Coming soon.</h2>
+        </a>
+        <div class="accordion-pane">
+            <div class="pane left-pane">
+                <h3>Fixed Parameters</h3>
+                <dl>
+                    <dt>Authorization URL</em></dt>
+                    <dd class="copy">{{.ImplicitCnfg.AuthURL}}</dd>
+                    <dt>Client ID</dt>
+                    <dd class="copy">{{.ImplicitCnfg.ClientID}}</dd>
+                </dl>
+            </div>
+            <div class="pane middle-pane">
+                <h3>Request Parameters</h3>
+                <dl>
+                    <dt><span>response_type=token</span><strong class="reqd-badge">required</strong></dt>
+                    <dd>Indicates that the application is requesting for an implicit grant token.</dd>
+                </dl>
+                <dl>
+                    <dt><span>client_id={{.ImplicitCnfg.ClientID}}</span><strong class="reqd-badge">required</strong></dt>
+                    <dd>Your client ID.</dd>
+                </dl>
+                <dl>
+                    <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
+                    <dd>Redirects the user-agent to this address when the authorization is complete.</dd>
+                </dl>
+                <dl>
+                    <dt><span>scope=...</span><strong class="opt-badge">optional</strong></dt>
+                    <dd>Feel free to show your creativity here as the server ignores this.</dd>
+                </dl>
+            </div>
+            <div class="pane right-pane">
+                <h3>Process</h3>
+                <ul>
+                    <li>Open the authorization URL with the required parameters encoded in the URL.
+                        <br>Refer the example request below.
+                    </li>
+                    <li>If the user authorizes, an access token is issued.</li>
+                    <li>It is valid for <strong>1 hour</strong> from the time of issue.</li>
+                    <li>Use it to make requests to the dummy endpoints.</li>
+                </ul>
+            </div>
+            <div class="final-url">
+                <h3>Example Request</h3>
+                <div class="code-link">
+                    GET
+                    {{.ImplicitCnfg.AuthURL}}?response_type=token&client_id={{.ImplicitCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
+                </div>
+                <br>
             </div>
         </div>
-    </a>
+    </div>
 {{ end }}
 
 {{ define "ropc" }}
