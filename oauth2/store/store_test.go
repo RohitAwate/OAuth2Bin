@@ -33,7 +33,7 @@ func testGenerateNonceFunc(n, i int) func(*testing.T) {
 
 func TestRefreshTokenExists(t *testing.T) {
 	code := NewAuthCodeGrant()
-	token, err := NewAuthCodeToken(code)
+	token, err := NewAuthCodeToken(code, "")
 	if err != nil {
 		t.Fatal(err)
 	}

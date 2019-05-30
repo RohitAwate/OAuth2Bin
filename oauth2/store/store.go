@@ -41,14 +41,14 @@ type AuthCodeToken struct {
 // If crossed, an error is thrown.
 // Else a new token is generated and returned.
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
-func NewAuthCodeToken(code string) (*AuthCodeToken, error) {
+func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
 	conn := cache.NewConn()
 	defer conn.Close()
 	reply, _ := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
 
 	// If not found in the Redis cache, there are three possibilites:
-	// - A token was already issued on this. The previously-issued token must be revoked.
+	// - A token was already issued on this authorization grant and must be revoked.
 	// - It has expired and was removed by housekeep().
 	// - It was never issued.
 	if reply == 0 {
@@ -73,6 +73,13 @@ func NewAuthCodeToken(code string) (*AuthCodeToken, error) {
 	// Generates a new key if a duplicate is encountered
 	for reply == 1 {
 		token, meta = generateAuthCodeToken(code)
+
+		// Replace token-generated refresh token with function parameter 'refreshToken'
+		// if it is of length 64 since SHA-256 generates a string of that length.
+		if len(refreshToken) == 64 {
+			token.RefreshToken = refreshToken
+		}
+
 		reply, _ = redis.Int(conn.Do("HEXISTS", authCodeTokensSet, token.AccessToken))
 	}
 
@@ -95,7 +102,7 @@ func NewAuthCodeToken(code string) (*AuthCodeToken, error) {
 // NewRefreshToken returns
 func NewRefreshToken(refreshToken string) (*AuthCodeToken, error) {
 	code := NewAuthCodeGrant()
-	token, err := NewAuthCodeToken(code)
+	token, err := NewAuthCodeToken(code, refreshToken)
 	if err != nil {
 		return nil, err
 	}

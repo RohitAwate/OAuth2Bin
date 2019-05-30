@@ -49,7 +49,7 @@ func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, par
 		return
 	}
 
-	token, err := store.NewAuthCodeToken(params["code"])
+	token, err := store.NewAuthCodeToken(params["code"], "")
 	if err != nil {
 		showJSONError(w, r, 400, requestError{
 			Error: "invalid_request",
