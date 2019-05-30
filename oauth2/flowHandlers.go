@@ -14,6 +14,14 @@ type flowHandler interface {
 	issueToken(w http.ResponseWriter, r *http.Request, params map[string]string)
 }
 
+// Enum for the OAuth 2.0 flows
+const (
+	AuthCode    = 1
+	Implicit    = 2
+	ROPC        = 3
+	ClientCreds = 4
+)
+
 // Implementation of flowHandler for the Authorization Code Flow
 type authCodeHandler struct {
 }
@@ -30,7 +38,7 @@ func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 	case "":
 		showError(w, r, 400, "Bad Request", "client_id is required")
 	case serverConfig.AuthCodeCnfg.ClientID:
-		presentAuthScreen(w, r)
+		presentAuthScreen(w, r, AuthCode)
 	default:
 		showError(w, r, 401, "Unauthorized", "Invalid client_id")
 	}
@@ -95,4 +103,26 @@ func handleRefresh(w http.ResponseWriter, r *http.Request, params map[string]str
 			Desc:  "expired or invalid refresh token",
 		})
 	}
+}
+
+// Implementation of flowHandler for the Implicit Grant Flow
+type implicitHandler struct {
+}
+
+func (*implicitHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
+	queryParams := r.URL.Query()
+	clientID := queryParams.Get("client_id")
+
+	switch clientID {
+	case "":
+		showError(w, r, 400, "Bad Request", "client_id is required")
+	case serverConfig.AuthCodeCnfg.ClientID:
+		presentAuthScreen(w, r, Implicit)
+	default:
+		showError(w, r, 401, "Unauthorized", "Invalid client_id")
+	}
+}
+
+func (*implicitHandler) issueToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
+
 }

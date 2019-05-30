@@ -10,7 +10,7 @@ import (
 )
 
 // presentAuthScreen shows the authorization screen to the user
-func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
+func presentAuthScreen(w http.ResponseWriter, r *http.Request, flow int) {
 	scopeList := []string{
 		"Fly to Mars",
 		"Travel back in time",
@@ -19,12 +19,14 @@ func presentAuthScreen(w http.ResponseWriter, r *http.Request) {
 
 	authScreenStruct := struct {
 		ScopeList []string
+		Flow      int
 	}{
 		ScopeList: scopeList,
+		Flow:      flow,
 	}
 
 	tmpl, err := template.ParseFiles(
-		"public/templates/authGrant.html",
+		"public/templates/authScreen.html",
 		"public/templates/base.html",
 	)
 	if err != nil {

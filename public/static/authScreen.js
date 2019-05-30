@@ -11,6 +11,16 @@ function parseParams(url) {
     return paramsObj;
 }
 
-const redirectURI = parseParams()["redirect_uri"];
+// Check if the redirect URI is passed in the URL
+var redirectURI = parseParams()["redirect_uri"];
 const node = document.getElementById("redirectURI");
-node.value = redirectURI;
+
+// If redirect URI not passed and if using Implicit flow,
+// unhide the redirectURI field.
+// Else, just set the value, but don't unhide.
+if (redirectURI === undefined) {
+    redirectURI = "";
+    node.hidden = false;
+} else {
+    node.value = redirectURI;
+}

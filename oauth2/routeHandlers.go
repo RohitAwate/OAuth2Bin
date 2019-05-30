@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 )
@@ -15,14 +16,19 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	var handler flowHandler
 	params := r.URL.Query()
 
-	if params.Get("response_type") == "" || params.Get("client_id") == "" || params.Get("redirect_uri") == "" {
-		showError(w, r, 400, "Bad Request", "response_type, client_id and redirect_uri are required.")
+	// Perform empty checks on the following parameters:
+	// - response_type
+	// - client_id
+	if params.Get("response_type") == "" || params.Get("client_id") == "" {
+		showError(w, r, 400, "Bad Request", "response_type and client_id are required.")
 		return
 	}
 
 	switch r.URL.Query().Get("response_type") {
 	case "code":
 		handler = &authCodeHandler{}
+	case "token":
+		handler = &implicitHandler{}
 	}
 
 	handler.handleAuth(w, r)
@@ -37,11 +43,23 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	flow, err := strconv.Atoi(r.FormValue("flow"))
+	if err != nil {
+		showError(w, r, 400, "OAuth 2.0 Flow Error", "Unrecognized flow")
+		return
+	}
+
 	response := r.FormValue("response")
 	redirectURI := r.FormValue("redirectURI")
 
 	if response == "ACCEPT" {
-		redirectURI += "?code=" + store.NewAuthCodeGrant()
+		switch flow {
+		case AuthCode:
+			redirectURI += "?code=" + store.NewAuthCodeGrant()
+		case Implicit:
+
+		}
+
 	} else if response == "CANCEL" {
 		redirectURI += "?error=access_denied"
 	}
@@ -85,7 +103,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		handleRefresh(w, r, params)
 		return
 	default:
-		showJSONError(w, r, 400, "grant_type is required")
+		showJSONError(w, r, 400, "grant_type absent or invalid")
 		return
 	}
 
