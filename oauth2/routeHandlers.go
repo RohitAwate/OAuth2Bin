@@ -57,7 +57,13 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 		case AuthCode:
 			redirectURI += "?code=" + store.NewAuthCodeGrant()
 		case Implicit:
+			token, err := store.NewImplicitToken()
+			if err != nil {
+				showError(w, r, 500, "Internal Server Error", "Token generation failed. Please try again.")
+				return
+			}
 
+			redirectURI += fmt.Sprintf("#access_token=%s&token_type=bearer&expires_in=%d", token.AccessToken, token.ExpiresIn)
 		}
 
 	} else if response == "CANCEL" {

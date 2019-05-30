@@ -1,12 +1,9 @@
 package store
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"time"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
@@ -21,18 +18,19 @@ const (
 	authCodeGrantSet = "OA2B_AC_Grants"
 )
 
-// tokenMeta holds the meta data of an access token
-type tokenMeta struct {
-	AuthGrant    string    `json:"auth_grant"`
-	CreationTime time.Time `json:"creation_time"`
-	Nonce        string    `json:"nonce"`
-}
-
-// AuthCodeToken represents an OAuth 2.0 access token
+// AuthCodeToken represents a token issued by the Authorization Code flow
+// https://tools.ietf.org/html/rfc6749#section-4.1.3
 type AuthCodeToken struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
 	ExpiresIn    int    `json:"expires_in"`
+}
+
+// authCodeTokenMeta holds the meta data of an access token
+type authCodeTokenMeta struct {
+	AuthGrant    string    `json:"auth_grant"`
+	CreationTime time.Time `json:"creation_time"`
+	Nonce        string    `json:"nonce"`
 }
 
 // NewAuthCodeToken issues new access tokens for the Authorization Code flow.
@@ -45,7 +43,11 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
 	conn := cache.NewConn()
 	defer conn.Close()
-	reply, _ := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
+	reply, err := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
 
 	// If not found in the Redis cache, there are three possibilites:
 	// - A token was already issued on this authorization grant and must be revoked.
@@ -56,19 +58,23 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 	}
 
 	// If found, check if it has expired since housekeeping runs only every 5 minutes
-	intTime, _ := redis.Int64(conn.Do("HGET", authCodeGrantSet, code))
+	intTime, err := redis.Int64(conn.Do("HGET", authCodeGrantSet, code))
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
 	issueTime := time.Unix(intTime, 0)
 	if time.Now().Sub(issueTime) >= 10*time.Minute {
 		return nil, fmt.Errorf("expired authorization grant")
 	}
 
 	// If not expired, remove it from the Redis cache since
-	// we're about to issue a token for it
+	// we're about to issue a token for it.
 	removeGrant(code)
 
 	var token *AuthCodeToken
-	var meta *tokenMeta
-	var err error
+	var meta *authCodeTokenMeta
 
 	// Generates a new key if a duplicate is encountered
 	for reply == 1 {
@@ -80,12 +86,16 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 			token.RefreshToken = refreshToken
 		}
 
-		reply, _ = redis.Int(conn.Do("HEXISTS", authCodeTokensSet, token.AccessToken))
+		reply, err = redis.Int(conn.Do("HEXISTS", authCodeTokensSet, token.AccessToken))
+		if err != nil {
+			log.Println(err)
+			return nil, err
+		}
 	}
 
 	jsonBytes, err := json.Marshal(struct {
-		Token AuthCodeToken `json:"token"`
-		Meta  tokenMeta     `json:"meta"`
+		Token AuthCodeToken     `json:"token"`
+		Meta  authCodeTokenMeta `json:"meta"`
 	}{Token: *token, Meta: *meta})
 	if err != nil {
 		panic(err)
@@ -187,7 +197,7 @@ func invalidateToken(accessToken string) {
 // the code, time of creation and a nonce.
 // Refresh Token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // time of creation and the same nonce as above.
-func generateAuthCodeToken(code string) (*AuthCodeToken, *tokenMeta) {
+func generateAuthCodeToken(code string) (*AuthCodeToken, *authCodeTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
@@ -198,39 +208,9 @@ func generateAuthCodeToken(code string) (*AuthCodeToken, *tokenMeta) {
 			AccessToken:  accessToken,
 			RefreshToken: refreshToken,
 			ExpiresIn:    3600,
-		}, &tokenMeta{
+		}, &authCodeTokenMeta{
 			AuthGrant:    code,
 			CreationTime: creationTime,
 			Nonce:        nonce,
 		}
-}
-
-// Hashes the string using SHA-256
-func hash(str string) string {
-	hasher := sha256.New()
-	hasher.Write([]byte(str))
-	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-const src = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-// Generates a string of given length filled with random bytes
-func generateNonce(n int) string {
-	if n < 1 {
-		return ""
-	}
-
-	b := make([]byte, n)
-	srcLen := int64(len(src))
-
-	for i := range b {
-		b[i] = src[rand.Int63()%srcLen]
-	}
-
-	return string(b)
-}
-
-func init() {
-	// Seeding the random package
-	rand.Seed(time.Now().UnixNano())
 }

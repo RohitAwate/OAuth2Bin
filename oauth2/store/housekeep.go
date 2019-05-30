@@ -13,7 +13,7 @@ import (
 
 type tokenStruct struct {
 	Token AuthCodeToken
-	Meta  tokenMeta
+	Meta  authCodeTokenMeta
 }
 
 func tokenHousekeep(wg *sync.WaitGroup) {
