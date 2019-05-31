@@ -65,7 +65,7 @@ func NewImplicitToken() (*ImplicitToken, error) {
 }
 
 // Generates an access token.
-// Access Token is a hex-encoded string of the SHA-256 hash of the
+// Access token is a hex-encoded string of the SHA-256 hash of the
 // concatenation of the time of creation and a nonce.
 func generateImplicitToken() (*ImplicitToken, *implicitTokenMeta) {
 	nonce := generateNonce(16)

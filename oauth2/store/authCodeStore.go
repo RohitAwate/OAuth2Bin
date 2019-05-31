@@ -193,9 +193,9 @@ func invalidateToken(accessToken string) {
 }
 
 // Generates access and refresh tokens.
-// Access Token is a hex-encoded string of the SHA-256 hash of the concatenation of
+// Access token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // the code, time of creation and a nonce.
-// Refresh Token is a hex-encoded string of the SHA-256 hash of the concatenation of
+// Refresh token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // time of creation and the same nonce as above.
 func generateAuthCodeToken(code string) (*AuthCodeToken, *authCodeTokenMeta) {
 	nonce := generateNonce(16)
