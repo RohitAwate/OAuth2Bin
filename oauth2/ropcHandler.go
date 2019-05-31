@@ -42,3 +42,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 
 	fmt.Fprintln(w, string(jsonBytes))
 }
+
+func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
+
+}

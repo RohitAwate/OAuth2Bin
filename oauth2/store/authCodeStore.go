@@ -14,8 +14,11 @@ const (
 	// Redis HSET which holds the issued tokens
 	authCodeTokensSet = "OA2B_AC_Tokens"
 
-	// Redis SET which holds the issued grants until a token request is made.
+	// Redis HSET which holds the issued grants until a token request is made.
 	authCodeGrantSet = "OA2B_AC_Grants"
+
+	// AuthCodeRefreshFlowID is prepended to a refresh token issued by the Authorization Code flow
+	AuthCodeRefreshFlowID = "AUTHCODE"
 )
 
 // AuthCodeToken represents a token issued by the Authorization Code flow
@@ -81,8 +84,9 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 		token, meta = generateAuthCodeToken(code)
 
 		// Replace token-generated refresh token with function parameter 'refreshToken'
-		// if it is of length 64 since SHA-256 generates a string of that length.
-		if len(refreshToken) == 64 {
+		// if it is of length 72 since SHA-256 generates a string of length 64 and we
+		// prepend it with a flow identifier of length 8. (AUTHCODE or PASSCRED)
+		if len(refreshToken) == 72 {
 			token.RefreshToken = refreshToken
 		}
 
@@ -196,14 +200,15 @@ func invalidateAuthCodeToken(accessToken string) {
 // Generates access and refresh tokens.
 // Access token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // the code, time of creation and a nonce.
-// Refresh token is a hex-encoded string of the SHA-256 hash of the concatenation of
-// time of creation and the same nonce as above.
+// Refresh token starts with the flow identifier "AUTHCODE" followed by a hex-encoded string of
+// the SHA-256 hash of the concatenation of time of creation and the same nonce as above.
 func generateAuthCodeToken(code string) (*AuthCodeToken, *authCodeTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
 	accessToken := hash(fmt.Sprintf("%s%s%s", code, creationTime, nonce))
 	refreshToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
+	refreshToken = AuthCodeRefreshFlowID + refreshToken
 
 	return &AuthCodeToken{
 			AccessToken:  accessToken,

@@ -10,7 +10,12 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-const ropcTokensSet = "OA2B_ROPC_Tokens"
+const (
+	ropcTokensSet = "OA2B_ROPC_Tokens"
+
+	// ROPCRefreshFlowID is prepended to a refresh token issued by the ROPC flow
+	ROPCRefreshFlowID = "PASSCRED"
+)
 
 // ROPCToken represents a token issued by the Resource Owner Password Credentials flow
 // https://tools.ietf.org/html/rfc6749#section-4.3.3
@@ -67,14 +72,16 @@ func NewROPCToken() (*ROPCToken, error) {
 // Generates access and refresh tokens.
 // Access token is a hex-encoded string of the SHA-256 hash of the concatenation of
 // the time of creation and a nonce.
-// Refresh token is a hex-encoded string of the SHA-256 hash of the concatenation of
-// the access token, the time of creation and the same nonce.
+// Refresh token starts with the flow identifier "PASSCRED" followed by the hex-encoded
+// string of the SHA-256 hash of the concatenation of the access token, the time of
+// creation and the same nonce.
 func generateROPCToken() (*ROPCToken, *ropcTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
 	accessToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
 	refreshToken := hash(fmt.Sprintf("%s%s%s", accessToken, creationTime, nonce))
+	refreshToken = ROPCRefreshFlowID + refreshToken
 
 	return &ROPCToken{
 			AccessToken:  accessToken,

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 )
@@ -80,9 +81,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		}{Error: r.Method + " not allowed."})
 		return
 	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
-		showJSONError(w, r, 400, struct {
-			Error string `json:"error"`
-		}{Error: "Invalid Content-Type: " + r.Header.Get("Content-Type")})
+		showJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
 		return
 	}
 
@@ -103,7 +102,16 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	case "authorization_code":
 		handleAuthCodeToken(w, r, params)
 	case "refresh_token":
-		handleAuthCodeRefresh(w, r, params)
+		if params["refresh_token"] == "" {
+			showJSONError(w, r, 400, "refresh_token required")
+			return
+		}
+
+		if strings.HasPrefix(params["refresh_token"], store.AuthCodeRefreshFlowID) {
+			handleAuthCodeRefresh(w, r, params)
+		} else if strings.HasPrefix(params["refresh_token"], store.ROPCRefreshFlowID) {
+			handleROPCRefresh(w, r, params)
+		}
 	case "password":
 		handleROPCToken(w, r, params)
 	default:
