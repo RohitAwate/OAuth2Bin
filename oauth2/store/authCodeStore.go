@@ -71,7 +71,7 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 
 	// If not expired, remove it from the Redis cache since
 	// we're about to issue a token for it.
-	removeGrant(code)
+	removeAuthCodeGrant(code)
 
 	var token *AuthCodeToken
 	var meta *authCodeTokenMeta
@@ -109,8 +109,9 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 	return token, nil
 }
 
-// NewRefreshToken returns
-func NewRefreshToken(refreshToken string) (*AuthCodeToken, error) {
+// NewAuthCodeRefreshToken returns new token for the previously issued refresh token
+// The refresh token is kept intact and can be used for future requests.
+func NewAuthCodeRefreshToken(refreshToken string) (*AuthCodeToken, error) {
 	code := NewAuthCodeGrant()
 	token, err := NewAuthCodeToken(code, refreshToken)
 	if err != nil {
@@ -136,12 +137,12 @@ func NewAuthCodeGrant() string {
 	return code
 }
 
-// RefreshTokenExists checks if the refresh token exists in the Redis cache
+// AuthCodeRefreshTokenExists checks if the refresh token exists in the Redis cache
 // and returns the appropriate boolean value.
 // Params:
 // refreshToken: the token to look for in the cache
 // invalidateIfFound: if true, the token is invalidated if found
-func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
+func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	conn := cache.NewConn()
 	defer conn.Close()
 
@@ -160,7 +161,7 @@ func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 
 		if refreshToken == token.Token.RefreshToken {
 			if invalidateIfFound {
-				invalidateToken(token.Token.AccessToken)
+				invalidateAuthCodeToken(token.Token.AccessToken)
 			}
 
 			return true
@@ -170,9 +171,9 @@ func RefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	return false
 }
 
-// VerifyToken checks if the token exists in the Redis cache.
+// VerifyAuthCodeToken checks if the token exists in the Redis cache.
 // Returns true if token found, false otherwise.
-func VerifyToken(token string) bool {
+func VerifyAuthCodeToken(token string) bool {
 	conn := cache.NewConn()
 	defer conn.Close()
 
@@ -180,13 +181,13 @@ func VerifyToken(token string) bool {
 	return err == nil
 }
 
-func removeGrant(code string) {
+func removeAuthCodeGrant(code string) {
 	conn := cache.NewConn()
 	defer conn.Close()
 	conn.Do("HDEL", authCodeGrantSet, code)
 }
 
-func invalidateToken(accessToken string) {
+func invalidateAuthCodeToken(accessToken string) {
 	conn := cache.NewConn()
 	defer conn.Close()
 	conn.Do("HDEL", authCodeTokensSet, accessToken)

@@ -11,7 +11,6 @@ import (
 
 // Checks if the values for username, password, client_id and client_secret match the server presets.
 // If yes, an access token is issued.
-//
 // Refer: https://tools.ietf.org/html/rfc6749#section-4.3.2
 func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["username"] != serverConfig.ROPCCnfg.Username ||

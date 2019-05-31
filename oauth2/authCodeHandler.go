@@ -65,8 +65,8 @@ func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[st
 	}
 
 	// If found, invalidate previously issued token
-	if store.RefreshTokenExists(params["refresh_token"], true) {
-		token, err := store.NewRefreshToken(params["refresh_token"])
+	if store.AuthCodeRefreshTokenExists(params["refresh_token"], true) {
+		token, err := store.NewAuthCodeRefreshToken(params["refresh_token"])
 		if err != nil {
 			showJSONError(w, r, 500, requestError{
 				Error: "could not generate token",

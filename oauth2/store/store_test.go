@@ -38,12 +38,12 @@ func TestRefreshTokenExists(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	exists := RefreshTokenExists(token.RefreshToken, true)
+	exists := AuthCodeRefreshTokenExists(token.RefreshToken, true)
 
 	if exists {
 		t.Log("found refresh token")
 	} else {
-		removeGrant(code)
+		removeAuthCodeGrant(code)
 		t.Fatal("failed to find refresh token")
 	}
 }
