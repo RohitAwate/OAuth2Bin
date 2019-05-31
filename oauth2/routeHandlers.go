@@ -101,10 +101,9 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var handler flowHandler
 	switch params["grant_type"] {
 	case "authorization_code":
-		handler = &authCodeHandler{}
+		handleAuthCodeToken(w, r, params)
 	case "refresh_token":
 		handleRefresh(w, r, params)
 		return
@@ -112,8 +111,6 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		showJSONError(w, r, 400, "grant_type absent or invalid")
 		return
 	}
-
-	handler.issueToken(w, r, params)
 }
 
 type echoResponse struct {

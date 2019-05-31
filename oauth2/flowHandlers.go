@@ -11,7 +11,6 @@ import (
 // flowHandler handles the request for a specific OAuth 2.0 flow
 type flowHandler interface {
 	handleAuth(w http.ResponseWriter, r *http.Request)
-	issueToken(w http.ResponseWriter, r *http.Request, params map[string]string)
 }
 
 // Enum for the OAuth 2.0 flows
@@ -47,7 +46,7 @@ func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 // issueToken checks for the existence of all parameters detailed in Section 4.1.3 of RFC 6749 (https://tools.ietf.org/html/rfc6749#section-4.1.3).
 // If not present, an HTTP 400 response is sent.
 // Else a new token is generated, added to the store, and returned to the user in a JSON response.
-func (h *authCodeHandler) issueToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] == "" || params["grant_type"] == "" ||
 		params["redirect_uri"] == "" || params["code"] == "" {
 		showJSONError(w, r, 400, requestError{
@@ -121,8 +120,4 @@ func (*implicitHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
 	default:
 		showError(w, r, 401, "Unauthorized", "Invalid client_id")
 	}
-}
-
-func (*implicitHandler) issueToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
-
 }
