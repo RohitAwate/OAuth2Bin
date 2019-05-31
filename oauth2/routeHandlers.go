@@ -13,7 +13,6 @@ import (
 
 // Routes the request to a AuthorizationHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
-	var handler flowHandler
 	params := r.URL.Query()
 
 	// Perform empty checks on the following parameters:
@@ -26,12 +25,10 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 
 	switch r.URL.Query().Get("response_type") {
 	case "code":
-		handler = &authCodeHandler{}
+		handleAuthCodeAuth(w, r)
 	case "token":
-		handler = &implicitHandler{}
+		handleImplicitAuth(w, r)
 	}
-
-	handler.handleAuth(w, r)
 }
 
 // Invoked by the Authorization Grant screen when the user accepts the authorization request.
@@ -97,7 +94,8 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 
 	params, err := parseParams(string(body))
 	if err != nil {
-		showJSONError(w, r, 400, "Expected parameters not found. Refer RFC 6749 Section 4.1.3 (https://tools.ietf.org/html/rfc6749#section-4.1.3)")
+		fmt.Println(err)
+		showJSONError(w, r, 400, "Expected parameters not found.")
 		return
 	}
 
@@ -105,11 +103,11 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	case "authorization_code":
 		handleAuthCodeToken(w, r, params)
 	case "refresh_token":
-		handleRefresh(w, r, params)
-		return
+		handleAuthCodeRefresh(w, r, params)
+	case "password":
+		handleROPCToken(w, r, params)
 	default:
 		showJSONError(w, r, 400, "grant_type absent or invalid")
-		return
 	}
 }
 

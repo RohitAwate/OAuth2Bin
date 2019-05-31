@@ -8,5 +8,12 @@
     "implicit": {
         "authURL": "http://localhost:8080/authorize",
         "clientID": "clientID"
+    },
+    "ropc": {
+        "tokenURL": "http://localhost:8080/token",
+        "username": "oa2buser",
+        "password": "oa2bpass",
+        "clientID": "clientID",
+        "clientSecret": "clientSecret"
     }
 }

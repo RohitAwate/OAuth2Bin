@@ -90,7 +90,7 @@ func parseParams(url string) (map[string]string, error) {
 		url = strings.Split(url, "?")[1]
 	}
 
-	if !strings.Contains(url, "&") {
+	if !strings.Contains(url, "=") {
 		return nil, fmt.Errorf("%s contains no key-value pairs", url)
 	}
 

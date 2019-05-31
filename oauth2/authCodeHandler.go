@@ -8,28 +8,11 @@ import (
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 )
 
-// flowHandler handles the request for a specific OAuth 2.0 flow
-type flowHandler interface {
-	handleAuth(w http.ResponseWriter, r *http.Request)
-}
-
-// Enum for the OAuth 2.0 flows
-const (
-	AuthCode    = 1
-	Implicit    = 2
-	ROPC        = 3
-	ClientCreds = 4
-)
-
-// Implementation of flowHandler for the Authorization Code Flow
-type authCodeHandler struct {
-}
-
 // handleAuth checks for the existence of client_id in the query parameters.
 // If not present, an HTTP 400 response is sent.
 // If an unrecognized client_id is found, an HTTP 401 response is sent.
 // Else, an authorization screen is presented to the user.
-func (h *authCodeHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
+func handleAuthCodeAuth(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 	clientID := queryParams.Get("client_id")
 
@@ -72,7 +55,7 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 }
 
 // Refer RFC 6749 Section 6 (https://tools.ietf.org/html/rfc6749#section-6)
-func handleRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
+func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["refresh_token"] == "" {
 		showJSONError(w, r, 400, requestError{
 			Error: "invalid_request",
@@ -101,23 +84,5 @@ func handleRefresh(w http.ResponseWriter, r *http.Request, params map[string]str
 			Error: "invalid refresh_token",
 			Desc:  "expired or invalid refresh token",
 		})
-	}
-}
-
-// Implementation of flowHandler for the Implicit Grant Flow
-type implicitHandler struct {
-}
-
-func (*implicitHandler) handleAuth(w http.ResponseWriter, r *http.Request) {
-	queryParams := r.URL.Query()
-	clientID := queryParams.Get("client_id")
-
-	switch clientID {
-	case "":
-		showError(w, r, 400, "Bad Request", "client_id is required")
-	case serverConfig.AuthCodeCnfg.ClientID:
-		presentAuthScreen(w, r, Implicit)
-	default:
-		showError(w, r, 401, "Unauthorized", "Invalid client_id")
 	}
 }
