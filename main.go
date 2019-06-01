@@ -28,7 +28,7 @@ func main() {
 }
 
 func getServerConfig() *oauth2.OA2Config {
-	fd, err := os.Open("config/server.json")
+	fd, err := os.Open("config/flowParams.json")
 	if err != nil {
 		return nil
 	}
@@ -53,7 +53,7 @@ func getServerConfig() *oauth2.OA2Config {
 }
 
 func getRatePolicies() []middleware.Policy {
-	fd, err := os.Open("config/policy.json")
+	fd, err := os.Open("config/ratePolicies.json")
 	if err != nil {
 		return nil
 	}
