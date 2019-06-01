@@ -44,5 +44,25 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 }
 
 func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
+	// Invalidate previously issued token
+	if store.ROPCRefreshTokenExists(params["refresh_token"], true) {
+		token, err := store.NewROPCRefreshToken(params["refresh_token"])
+		if err != nil {
+			showJSONError(w, r, 500, requestError{
+				Error: "could not generate token",
+				Desc:  err.Error(),
+			})
+			return
+		}
 
+		w.Header().Set("Content-Type", "application/json;charset=UTF-8")
+		jsonBytes, err := json.Marshal(token)
+
+		fmt.Fprintln(w, string(jsonBytes))
+	} else {
+		showJSONError(w, r, 400, requestError{
+			Error: "invalid refresh_token",
+			Desc:  "expired or invalid refresh token",
+		})
+	}
 }

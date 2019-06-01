@@ -1,6 +1,8 @@
 package store
 
-import "testing"
+import (
+	"testing"
+)
 
 // TestROPCFlow tests the entirety of the functions set of ropcStore
 // as they would be used by the Resource Owner Password Credentials flow
@@ -29,4 +31,11 @@ func TestROPCFlow(t *testing.T) {
 	// Remove the token
 	invalidateROPCToken(token.AccessToken)
 	t.Logf("Token invalidated\n")
+}
+
+func TestROPCRefreshTokenExists(t *testing.T) {
+	res := ROPCRefreshTokenExists("", true)
+	if res {
+		t.Fatalf("Empty refresh token should not exist")
+	}
 }

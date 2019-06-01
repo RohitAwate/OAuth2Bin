@@ -101,9 +101,11 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	switch params["grant_type"] {
 	case "authorization_code":
 		handleAuthCodeToken(w, r, params)
+	case "password":
+		handleROPCToken(w, r, params)
 	case "refresh_token":
-		if params["refresh_token"] == "" {
-			showJSONError(w, r, 400, "refresh_token required")
+		if len(params["refresh_token"]) != 72 {
+			showJSONError(w, r, 400, "refresh_token missing or invalid")
 			return
 		}
 
@@ -112,8 +114,6 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		} else if strings.HasPrefix(params["refresh_token"], store.ROPCRefreshFlowID) {
 			handleROPCRefresh(w, r, params)
 		}
-	case "password":
-		handleROPCToken(w, r, params)
 	default:
 		showJSONError(w, r, 400, "grant_type absent or invalid")
 	}
