@@ -23,6 +23,8 @@ func TestLimiterHandle(t *testing.T) {
 	}))
 	go http.ListenAndServe(":8081", nil)
 
+	time.Sleep(3 * time.Second)
+
 	// Go creates a separate TCP connection for every HTTP request
 	// if we use http.Get(url). This creates a problem in our case since
 	// OA2B sees a different port number for every request thereby allowing
