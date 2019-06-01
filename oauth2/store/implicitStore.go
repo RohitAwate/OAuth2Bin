@@ -64,6 +64,22 @@ func NewImplicitToken() (*ImplicitToken, error) {
 	return token, nil
 }
 
+// VerifyImplicitToken checks if the token exists in the Redis cache.
+// Returns true if token found, false otherwise.
+func VerifyImplicitToken(token string) bool {
+	conn := cache.NewConn()
+	defer conn.Close()
+
+	_, err := redis.String(conn.Do("HGET", implicitTokensSet, token))
+	return err == nil
+}
+
+func invalidateImplicitToken(accessToken string) {
+	conn := cache.NewConn()
+	defer conn.Close()
+	conn.Do("HDEL", implicitTokensSet, accessToken)
+}
+
 // Generates an access token.
 // Access token is a hex-encoded string of the SHA-256 hash of the
 // concatenation of the time of creation and a nonce.

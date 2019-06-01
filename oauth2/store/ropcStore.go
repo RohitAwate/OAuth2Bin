@@ -33,7 +33,7 @@ type ropcTokenMeta struct {
 // NewROPCToken issues new access and refresh tokens for the ROPC flow.
 // It generates and stores a token and stores it along with its meta data
 // in the Redis cache.
-func NewROPCToken() (*ROPCToken, error) {
+func NewROPCToken(refreshToken string) (*ROPCToken, error) {
 	conn := cache.NewConn()
 	defer conn.Close()
 
@@ -45,6 +45,13 @@ func NewROPCToken() (*ROPCToken, error) {
 	// Generates a new key if a duplicate is encountered
 	for reply == 1 {
 		token, meta = generateROPCToken()
+
+		// Replace newly generated refresh token with function parameter 'refreshToken'
+		// if it is of length 72 since SHA-256 generates a string of length 64 and we
+		// prepend it with a flow identifier of length 8. (PASSCRED)
+		if len(refreshToken) == 72 {
+			token.RefreshToken = refreshToken
+		}
 
 		reply, err = redis.Int(conn.Do("HEXISTS", ropcTokensSet, token.AccessToken))
 		if err != nil {
@@ -67,6 +74,67 @@ func NewROPCToken() (*ROPCToken, error) {
 	}
 
 	return token, nil
+}
+
+// NewROPCRefreshToken returns new token for the previously issued refresh token
+// The refresh token is kept intact and can be used for future requests.
+func NewROPCRefreshToken(refreshToken string) (*ROPCToken, error) {
+	token, err := NewROPCToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	return token, nil
+}
+
+// ROPCRefreshTokenExists checks if the refresh token exists in the Redis cache
+// and returns the appropriate boolean value.
+// Params:
+// refreshToken: the token to look for in the cache
+// invalidateIfFound: if true, the token is invalidated if found
+func ROPCRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
+	conn := cache.NewConn()
+	defer conn.Close()
+
+	var token ropcTokenStruct
+	items, err := redis.ByteSlices(conn.Do("HGETALL", ropcTokensSet))
+	if err != nil {
+		log.Println(err)
+	}
+
+	for i := 1; i < len(items); i += 2 {
+		err := json.Unmarshal(items[i], &token)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		if refreshToken == token.Token.RefreshToken {
+			if invalidateIfFound {
+				invalidateROPCToken(token.Token.AccessToken)
+			}
+
+			return true
+		}
+	}
+
+	return false
+}
+
+// VerifyROPCToken checks if the token exists in the Redis cache.
+// Returns true if token found, false otherwise.
+func VerifyROPCToken(token string) bool {
+	conn := cache.NewConn()
+	defer conn.Close()
+
+	_, err := redis.String(conn.Do("HGET", ropcTokensSet, token))
+	return err == nil
+}
+
+func invalidateROPCToken(accessToken string) {
+	conn := cache.NewConn()
+	defer conn.Close()
+	conn.Do("HDEL", ropcTokensSet, accessToken)
 }
 
 // Generates access and refresh tokens.

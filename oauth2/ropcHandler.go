@@ -25,7 +25,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 	}
 
 	// If everything checks out, issue the token
-	token, err := store.NewROPCToken()
+	token, err := store.NewROPCToken("")
 	if err != nil {
 		log.Println(err)
 		if err != nil {

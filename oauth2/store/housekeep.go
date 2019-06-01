@@ -11,15 +11,20 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-type tokenStruct struct {
-	Token AuthCodeToken
-	Meta  authCodeTokenMeta
+type authCodeTokenStruct struct {
+	Token AuthCodeToken     `json:"token"`
+	Meta  authCodeTokenMeta `json:"meta"`
+}
+
+type ropcTokenStruct struct {
+	Token ROPCToken     `json:"token"`
+	Meta  ropcTokenMeta `json:"meta"`
 }
 
 func tokenHousekeep(wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	var token tokenStruct
+	var token authCodeTokenStruct
 	var err error
 	var diff time.Duration
 

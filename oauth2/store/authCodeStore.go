@@ -83,9 +83,9 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 	for reply == 1 {
 		token, meta = generateAuthCodeToken(code)
 
-		// Replace token-generated refresh token with function parameter 'refreshToken'
+		// Replace newly-generated refresh token with function parameter 'refreshToken'
 		// if it is of length 72 since SHA-256 generates a string of length 64 and we
-		// prepend it with a flow identifier of length 8. (AUTHCODE or PASSCRED)
+		// prepend it with a flow identifier of length 8. (AUTHCODE)
 		if len(refreshToken) == 72 {
 			token.RefreshToken = refreshToken
 		}
@@ -97,10 +97,7 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 		}
 	}
 
-	jsonBytes, err := json.Marshal(struct {
-		Token AuthCodeToken     `json:"token"`
-		Meta  authCodeTokenMeta `json:"meta"`
-	}{Token: *token, Meta: *meta})
+	jsonBytes, err := json.Marshal(authCodeTokenStruct{Token: *token, Meta: *meta})
 	if err != nil {
 		panic(err)
 	}
@@ -150,7 +147,7 @@ func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) boo
 	conn := cache.NewConn()
 	defer conn.Close()
 
-	var token tokenStruct
+	var token authCodeTokenStruct
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
 	if err != nil {
 		log.Println(err)
