@@ -114,9 +114,9 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.HasPrefix(params["refresh_token"], store.AuthCodeRefreshFlowID) {
+		if strings.HasPrefix(params["refresh_token"], store.AuthCodeFlowID) {
 			handleAuthCodeRefresh(w, r, params)
-		} else if strings.HasPrefix(params["refresh_token"], store.ROPCRefreshFlowID) {
+		} else if strings.HasPrefix(params["refresh_token"], store.ROPCFlowID) {
 			handleROPCRefresh(w, r, params)
 		}
 	default:

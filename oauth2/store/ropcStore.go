@@ -13,8 +13,8 @@ import (
 const (
 	ropcTokensSet = "OA2B_ROPC_Tokens"
 
-	// ROPCRefreshFlowID is prepended to a refresh token issued by the ROPC flow
-	ROPCRefreshFlowID = "PASSCRED"
+	// ROPCFlowID is prepended to access and refresh tokens issued by the ROPC flow
+	ROPCFlowID = "PASSCRED"
 )
 
 // ROPCToken represents a token issued by the Resource Owner Password Credentials flow
@@ -147,9 +147,8 @@ func generateROPCToken() (*ROPCToken, *ropcTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
-	accessToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
-	refreshToken := hash(fmt.Sprintf("%s%s%s", accessToken, creationTime, nonce))
-	refreshToken = ROPCRefreshFlowID + refreshToken
+	accessToken := ROPCFlowID + hash(fmt.Sprintf("%s%s", creationTime, nonce))
+	refreshToken := ROPCFlowID + hash(fmt.Sprintf("%s%s%s", accessToken, creationTime, nonce))
 
 	return &ROPCToken{
 			AccessToken:  accessToken,

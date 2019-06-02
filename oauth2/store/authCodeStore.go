@@ -17,8 +17,8 @@ const (
 	// Redis HSET which holds the issued grants until a token request is made.
 	authCodeGrantSet = "OA2B_AC_Grants"
 
-	// AuthCodeRefreshFlowID is prepended to a refresh token issued by the Authorization Code flow
-	AuthCodeRefreshFlowID = "AUTHCODE"
+	// AuthCodeFlowID is prepended to a refresh token issued by the Authorization Code flow
+	AuthCodeFlowID = "AUTHCODE"
 )
 
 // AuthCodeToken represents a token issued by the Authorization Code flow
@@ -203,9 +203,8 @@ func generateAuthCodeToken(code string) (*AuthCodeToken, *authCodeTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
-	accessToken := hash(fmt.Sprintf("%s%s%s", code, creationTime, nonce))
-	refreshToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
-	refreshToken = AuthCodeRefreshFlowID + refreshToken
+	accessToken := AuthCodeFlowID + hash(fmt.Sprintf("%s%s%s", code, creationTime, nonce))
+	refreshToken := AuthCodeFlowID + hash(fmt.Sprintf("%s%s", creationTime, nonce))
 
 	return &AuthCodeToken{
 			AccessToken:  accessToken,

@@ -11,7 +11,12 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-const implicitTokensSet = "OA2B_IG_Tokens"
+const (
+	implicitTokensSet = "OA2B_IG_Tokens"
+
+	// ImplicitFlowID is prepended to access tokens issued by the Implicit Grant flow
+	ImplicitFlowID = "IMPLICIT"
+)
 
 // ImplicitToken represents a token issued by the Implicit Grant flow
 // https://tools.ietf.org/html/rfc6749#section-4.2.2
@@ -87,7 +92,7 @@ func generateImplicitToken() (*ImplicitToken, *implicitTokenMeta) {
 	nonce := generateNonce(16)
 	creationTime := time.Now()
 
-	accessToken := hash(fmt.Sprintf("%s%s", creationTime, nonce))
+	accessToken := ImplicitFlowID + hash(fmt.Sprintf("%s%s", creationTime, nonce))
 
 	return &ImplicitToken{
 			AccessToken: accessToken,
