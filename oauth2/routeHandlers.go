@@ -14,6 +14,11 @@ import (
 
 // Routes the request to a AuthorizationHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		showError(w, r, 405, "Method Not Allowed", r.Method+" not allowed.")
+		return
+	}
+
 	params := r.URL.Query()
 
 	// Perform empty checks on the following parameters:
