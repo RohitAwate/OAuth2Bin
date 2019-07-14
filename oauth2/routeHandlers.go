@@ -34,6 +34,8 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 		handleAuthCodeAuth(w, r)
 	case "token":
 		handleImplicitAuth(w, r)
+	default:
+		showError(w, r, http.StatusBadRequest, "Authorization Flow Error", "Unknown response_type: "+r.URL.Query().Get("response_type"))
 	}
 }
 

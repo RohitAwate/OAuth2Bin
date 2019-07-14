@@ -87,6 +87,7 @@ nav {
     align-items: center;
     flex-wrap: wrap;
     height: 75vh;
+    text-align: center;
 }
 
 .accordion-arrow {
