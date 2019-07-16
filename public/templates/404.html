@@ -1,0 +1,29 @@
+{{ define "404" }}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Not Found | OAuth 2.0 Bin</title>
+    <link rel="stylesheet" href="/public/static/light.css">
+    <style>
+        #form-logo {
+            max-width: 25%;
+            min-width: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    {{ template "nav" }}
+    <div id="grant-form">
+        <img src="/public/static/svg/404.svg" alt="form-logo" id="form-logo">
+        <h1>You have wandered into the unknown.</h1>
+    </div>
+</body>
+</html>
+
+{{ end }}
