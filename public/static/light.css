@@ -98,7 +98,6 @@ nav {
 .accordion-pane {
     color: white;
     display: none;
-    margin-top: 30px;
 }
 
 .accordion-head:target .accordion-pane {
@@ -137,19 +136,11 @@ dt {
     cursor: pointer;
 }
 
-.left-pane {
-    margin-right: 30px;
+.pane {
+    margin: 30px;
 }
 
-.middle-pane {
-    margin: 0 30px;
-}
-
-.right-pane {
-    margin-left: 30px;
-}
-
-.left-pane dl dd {
+.fixed-params dl dd {
     margin-top: 2px;
     padding: 5px;
     background-color: #5f90cf;
@@ -170,7 +161,7 @@ dt {
     border-radius: 3px;
 }
 
-.middle-pane dl dt span {
+.request-params dl dt span {
     margin-right: 10px;
     font-family: monospace;
     font-size: 1.3em;
@@ -179,34 +170,9 @@ dt {
     border-radius: 3px;
 }
 
-.middle-pane dl dd {
+.request-params dl dd {
     margin-top: 5px;
     font-size: 1.1em;
-}
-
-.right-pane ul {
-    margin-top: 20px;
-    list-style-type: circle;
-}
-
-.right-pane ul li {
-    padding: 5px;
-    font-size: 1.2em;
-}
-
-.code-link {
-    overflow-x: auto;
-    font-size: 1.3em;
-    font-family: monospace;
-    margin-top: 3px;
-    padding: 5px;
-    border-radius: 5px;
-    background-color: #5f90cf;
-}
-
-.final-url {
-    text-align: center;
-    padding: 30px 10px;
 }
 
 /* authGrant.html */
@@ -252,14 +218,8 @@ dt {
 
 /* Responsive */
 
-@media screen and (max-width: 1800px) {
-    .right-pane {
-        margin-top: 50px;
-    }
-}
-
 @media screen and (max-width: 1080px) {
-    .middle-pane {
-        margin-top: 50px;
+    .request-params {
+        margin-top: 20px;
     }
 }

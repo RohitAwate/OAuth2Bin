@@ -1,71 +1,63 @@
 {{ define "auth-code" }}
 <div class="flow-card accordion-head" id="authCodeCard">
-<a href="#authCodeCard">
-<div class="card-header">
-    <h2 class="card-title">Authorization Code</h2>
-</div>
-</a>
-<div class="accordion-pane">
-    <div class="pane left-pane">
-        <h3>Fixed Parameters</h3>
-        <dl>
-            <dt>Authorization URL</em></dt>
-            <dd class="copy">{{.AuthCodeCnfg.AuthURL}}</dd>
-            <dt>Access Token URL</dt>
-            <dd class="copy">{{.AuthCodeCnfg.TokenURL}}</dd>
-            <dt>Client ID</dt>
-            <dd class="copy">{{.AuthCodeCnfg.ClientID}}</dd>
-            <dt>Client Secret</dt>
-            <dd class="copy">{{.AuthCodeCnfg.ClientSecret}}</dd>
-        </dl>
-    </div>
-    <div class="pane middle-pane">
-        <h3>Request Parameters</h3>
-        <dl>
+    <a href="#authCodeCard">
+        <div class="card-header">
+            <h2 class="card-title">Authorization Code</h2>
+        </div>
+    </a>
+    <div class="accordion-pane">
+        <div class="pane fixed-params">
+            <h3>Flow Parameters</h3>
+            <dl>
+                <dt>Authorization URL</em></dt>
+                <dd class="copy">{{.AuthCodeCnfg.AuthURL}}</dd>
+                <dt>Access Token URL</dt>
+                <dd class="copy">{{.AuthCodeCnfg.TokenURL}}</dd>
+                <dt>Client ID</dt>
+                <dd class="copy">{{.AuthCodeCnfg.ClientID}}</dd>
+                <dt>Client Secret</dt>
+                <dd class="copy">{{.AuthCodeCnfg.ClientSecret}}</dd>
+            </dl>
+        </div>
+        <div class="pane request-params">
+            <h3>Grant Request Parameters</h3>
+            <dl>
                 <dt><span>response_type=code</span><strong class="reqd-badge">required</strong></dt>
-                <dd>Indicates that the application is requesting for an authorization grant token.</dd>
-        </dl>
-        <dl>
-            <dt><span>client_id={{.AuthCodeCnfg.ClientID}}</span><strong class="reqd-badge">required</strong></dt>
-            <dd>Your client ID.</dd>
-        </dl>
-        <dl>
-            <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
-            <dd>Redirects the user-agent to this address when the authorization is complete.</dd>
-        </dl>
-        <dl>
-            <dt><span>scope=...</span><strong class="opt-badge">optional</strong></dt>
-            <dd>Feel free to show your creativity here as the server ignores this.</dd>
-        </dl>
-    </div>
-    <div class="pane right-pane">
-        <h3>Process</h3>
-        <ul>
-            <li>Fetch an authorization grant by sending a GET request to the authorization URL.
-                <br>Refer the example request below.
-            </li>
-            <li>Authorization grant is valid for <strong>10 minutes</strong> from the time of issue.</li>
-            <li>Use this authorization token to send a POST request to the access token URL.
-                <br>Refer the example request below.
-            </li>
-            <li>Access token is valid for <strong>1 hour</strong> from the time of issue.</li>
-            <li>Use the access token to make requests to the dummy endpoints.</li>
-        </ul>
-    </div>
-    <div class="final-url">
-        <h3>Example Authorization Grant Request</h3>
-        <div class="code-link">
-            GET {{.AuthCodeCnfg.AuthURL}}?response_type=code&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world  
+                <dd>Indicates that the application is requesting for an authorization grant.</dd>
+            </dl>
+            <dl>
+                <dt><span>client_id={{.AuthCodeCnfg.ClientID}}</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Your client ID.</dd>
+            </dl>
+            <dl>
+                <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
+                <dd>Redirects the user-agent to this address when the authorization is complete.</dd>
+            </dl>
+            <dl>
+                <dt><span>scope=...</span><strong class="opt-badge">optional</strong></dt>
+                <dd>Feel free to show your creativity here as the server ignores this.</dd>
+            </dl>
         </div>
-        <br>
-        <h3>Example Access Token Request</h3>
-        <div class="code-link">
-            POST {{.AuthCodeCnfg.TokenURL}}
-            <br>
-            Body: grant_type=authorization_code&code=MyAuthGrant&client_id={{.AuthCodeCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com
+        <div class="pane request-params">
+            <h3>Token Request Parameters</h3>
+            <dl>
+                <dt><span>grant_type=authorization_code</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Indicates that the application is requesting for an authorization code grant token.</dd>
+            </dl>
+            <dl>
+                <dt><span>code=...</span><strong class="reqd-badge">required</strong></dt>
+                <dd>The grant received from the authorization endpoint.</dd>
+            </dl>
+            <dl>
+                <dt><span>client_id={{.ImplicitCnfg.ClientID}}</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Your client ID.</dd>
+            </dl>
+            <dl>
+                <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
+                <dd>Required if included in the authorization grant request. Values must be identical.</dd>
+            </dl>
         </div>
     </div>
-</div>
 </div>
 {{ end }}
 
@@ -77,8 +69,8 @@
         </div>
     </a>
     <div class="accordion-pane">
-        <div class="pane left-pane">
-            <h3>Fixed Parameters</h3>
+        <div class="pane fixed-params">
+            <h3>Flow Parameters</h3>
             <dl>
                 <dt>Authorization URL</em></dt>
                 <dd class="copy">{{.ImplicitCnfg.AuthURL}}</dd>
@@ -86,8 +78,8 @@
                 <dd class="copy">{{.ImplicitCnfg.ClientID}}</dd>
             </dl>
         </div>
-        <div class="pane middle-pane">
-            <h3>Request Parameters</h3>
+        <div class="pane request-params">
+            <h3>Token Request Parameters</h3>
             <dl>
                 <dt><span>response_type=token</span><strong class="reqd-badge">required</strong></dt>
                 <dd>Indicates that the application is requesting for an implicit grant token.</dd>
@@ -105,25 +97,6 @@
                 <dd>Feel free to show your creativity here as the server ignores this.</dd>
             </dl>
         </div>
-        <div class="pane right-pane">
-            <h3>Process</h3>
-            <ul>
-                <li>Open the authorization URL with the required parameters encoded in the URL.
-                    <br>Refer the example request below.
-                </li>
-                <li>If the user authorizes, an access token is issued.</li>
-                <li>It is valid for <strong>1 hour</strong> from the time of issue.</li>
-                <li>Use it to make requests to the dummy endpoints.</li>
-            </ul>
-        </div>
-        <div class="final-url">
-            <h3>Example Request</h3>
-            <div class="code-link">
-                GET
-                {{.ImplicitCnfg.AuthURL}}?response_type=token&client_id={{.ImplicitCnfg.ClientID}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
-            </div>
-            <br>
-        </div>
     </div>
 </div>
 {{ end }}
@@ -136,8 +109,8 @@
         </div>
     </a>
     <div class="accordion-pane">
-        <div class="pane left-pane">
-            <h3>Fixed Parameters</h3>
+        <div class="pane fixed-params">
+            <h3>Flow Parameters</h3>
             <dl>
                 <dt>Access Token URL</dt>
                 <dd class="copy">{{.ROPCCnfg.TokenURL}}</dd>
@@ -151,10 +124,10 @@
                 <dd class="copy">{{.ROPCCnfg.ClientSecret}}</dd>
             </dl>
         </div>
-        <div class="pane middle-pane">
-            <h3>Request Parameters</h3>
+        <div class="pane request-params">
+            <h3>Token Request Parameters</h3>
             <dl>
-                <dt><span>response_type=password</span><strong class="reqd-badge">required</strong></dt>
+                <dt><span>grant_type=password</span><strong class="reqd-badge">required</strong></dt>
                 <dd>Indicates that the application is requesting for an ROPC token.</dd>
             </dl>
             <dl>
@@ -174,46 +147,50 @@
                 <dd>Your client secret.</dd>
             </dl>
             <dl>
-                <dt><span>redirect_uri=...</span><strong class="opt-badge">optional</strong></dt>
-                <dd>Redirects the user-agent to this address when the authorization is complete.</dd>
-            </dl>
-            <dl>
                 <dt><span>scope=...</span><strong class="opt-badge">optional</strong></dt>
                 <dd>Feel free to show your creativity here as the server ignores this.</dd>
             </dl>
-        </div>
-        <div class="pane right-pane">
-            <h3>Process</h3>
-            <ul>
-                <li>Send a POST request to the access token URL with the required parameters.
-                    <br>Refer the example request below.
-                </li>
-                <li>An access token is issued.</li>
-                <li>It is valid for <strong>1 hour</strong> from the time of issue.</li>
-                <li>Use it to make requests to the dummy endpoints.</li>
-            </ul>
-        </div>
-        <div class="final-url">
-            <h3>Example Request</h3>
-            <div class="code-link">
-                POST
-                {{.ImplicitCnfg.AuthURL}}?response_type=password&username={{.ROPCCnfg.Username}}&password={{.ROPCCnfg.Password}}&client_id={{.ROPCCnfg.ClientID}}&client_secret={{.ROPCCnfg.ClientSecret}}&redirect_uri=https://my-redirect-uri.com&scope=hello-world
-            </div>
-            <br>
         </div>
     </div>
 </div>
 {{ end }}
 
 {{ define "clientCreds" }}
+<div class="flow-card accordion-head" id="clientCredsCard">
     <a href="#clientCredsCard">
-        <div class="flow-card accordion-head" id="clientCredsCard">
-            <div class="card-header">
-                <h2 class="card-title">Client Credentials</h2>
-            </div>
-            <div class="accordion-pane">
-                <h2 style="margin-bottom: 20px;">Coming soon.</h2>
-            </div>
+        <div class="card-header">
+            <h2 class="card-title">Client Credentials</h2>
         </div>
     </a>
+    <div class="accordion-pane">
+        <div class="pane fixed-params">
+            <h3>Flow Parameters</h3>
+            <dl>
+                <dt>Token URL</em></dt>
+                <dd class="copy">{{.ClientCredsCnfg.TokenURL}}</dd>
+                <dt>Client ID</dt>
+                <dd class="copy">{{.ClientCredsCnfg.ClientID}}</dd>
+            </dl>
+        </div>
+        <div class="pane request-params">
+            <h3>Token Request Parameters</h3>
+            <dl>
+                <dt><span>grant_type=client_credentials</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Indicates that the application is requesting for a client credentials grant token.</dd>
+            </dl>
+            <dl>
+                <dt><span>client_id={{.ClientCredsCnfg.ClientID}}</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Your client ID.</dd>
+            </dl>
+            <dl>
+                <dt><span>client_secret={{.ClientCredsCnfg.ClientSecret}}</span><strong class="reqd-badge">required</strong></dt>
+                <dd>Your client secret.</dd>
+            </dl>
+            <dl>
+                <dt><span>scope=...</span><strong class="opt-badge">optional</strong></dt>
+                <dd>Feel free to show your creativity here as the server ignores this.</dd>
+            </dl>
+        </div>
+    </div>
+</div>
 {{ end }}
