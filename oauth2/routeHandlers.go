@@ -85,7 +85,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		showJSONError(w, r, 405, struct {
 			Error string `json:"error"`
-		}{Error: r.Method + " not allowed."})
+		}{Error: r.Method + " not allowed"})
 		return
 	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
 		showJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
@@ -110,6 +110,8 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		handleAuthCodeToken(w, r, params)
 	case "password":
 		handleROPCToken(w, r, params)
+	case "client_credentials":
+		handleClientCredsToken(w, r, params)
 	case "refresh_token":
 		if len(params["refresh_token"]) != 72 {
 			showJSONError(w, r, 400, "refresh_token missing or invalid")

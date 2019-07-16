@@ -18,7 +18,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 		params["client_id"] != serverConfig.ROPCCnfg.ClientID ||
 		params["client_secret"] != serverConfig.ROPCCnfg.ClientSecret {
 		showJSONError(w, r, 400, requestError{
-			Error: "missing_or_invalid_parameters",
+			Error: "invalid_request",
 			Desc:  "username, password, client_id and client_secret are missing or invalid",
 		})
 		return
@@ -49,8 +49,8 @@ func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string
 		token, err := store.NewROPCRefreshToken(params["refresh_token"])
 		if err != nil {
 			showJSONError(w, r, 500, requestError{
-				Error: "could not generate token",
-				Desc:  err.Error(),
+				Error: "Internal Server Error",
+				Desc:  "Token generation failed. Please try again.",
 			})
 			return
 		}
@@ -61,7 +61,7 @@ func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string
 		fmt.Fprintln(w, string(jsonBytes))
 	} else {
 		showJSONError(w, r, 400, requestError{
-			Error: "invalid refresh_token",
+			Error: "invalid_refresh_token",
 			Desc:  "expired or invalid refresh token",
 		})
 	}
