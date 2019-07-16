@@ -10,8 +10,8 @@ import (
 )
 
 func handleClientCredsToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if params["client_id"] != serverConfig.ROPCCnfg.ClientID ||
-		params["client_secret"] != serverConfig.ROPCCnfg.ClientSecret {
+	if params["client_id"] != serverConfig.ClientCredsCnfg.ClientID ||
+		params["client_secret"] != serverConfig.ClientCredsCnfg.ClientSecret {
 		showJSONError(w, r, 400, requestError{
 			Error: "invalid_request",
 			Desc:  "client_id and client_secret are missing or invalid",

@@ -31,11 +31,19 @@ type ROPCConfig struct {
 	ClientSecret string `json:"clientSecret"`
 }
 
+// ClientCredsConfig defines the variables required in the OAuth 2.0 Client Credentials flow
+type ClientCredsConfig struct {
+	TokenURL     string `json:"tokenURL"`
+	ClientID     string `json:"clientID"`
+	ClientSecret string `json:"clientSecret"`
+}
+
 // OA2Config defines the configurations for all the flows in OAuth 2.0
 type OA2Config struct {
-	AuthCodeCnfg AuthCodeConfig `json:"authCode"`
-	ImplicitCnfg ImplicitConfig `json:"implicit"`
-	ROPCCnfg     ROPCConfig     `json:"ropc"`
+	AuthCodeCnfg    AuthCodeConfig    `json:"authCode"`
+	ImplicitCnfg    ImplicitConfig    `json:"implicit"`
+	ROPCCnfg        ROPCConfig        `json:"ropc"`
+	ClientCredsCnfg ClientCredsConfig `json:"clientCreds"`
 }
 
 // Used as response for failed token requests.
