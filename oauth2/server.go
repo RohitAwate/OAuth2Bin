@@ -67,7 +67,7 @@ func (s *OA2Server) route(pattern string, handler http.HandlerFunc) {
 func (s *OA2Server) handleHome(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(
 		"public/templates/index.html",
-		"public/templates/base.html",
+		"public/templates/nav.html",
 		"public/templates/cards.html",
 	)
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *OA2Server) handleHome(w http.ResponseWriter, r *http.Request) {
 func handleNotFound(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(
 		"public/templates/404.html",
-		"public/templates/base.html",
+		"public/templates/nav.html",
 	)
 	if err != nil {
 		log.Fatal(err)
