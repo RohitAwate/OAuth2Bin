@@ -8,9 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Error | OAuth 2.0 Bin</title>
+    <link rel="icon" href="/public/static/favicon-red.png" type="image/png" sizes="64x64">
     <link rel="stylesheet" href="/public/static/light.css">
     <style>
-        body {
+        .container-vertical {
             background-color: #c71c22;
             color: white;
         }
@@ -37,6 +38,7 @@
         <h1 id="titleStr">{{ .Title }}</h1>
         <h1 id="descStr">{{ .Desc }}</h1>
     </div>
+    {{ template "footer" }}
 </body>
 </html>
 

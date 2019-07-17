@@ -20,6 +20,13 @@ nav {
     background-color: white;
 }
 
+footer {
+    margin-top: 30px;
+    padding: 10px;
+    color: #747474;
+    text-align: center;
+}
+
 .img-responsive {
     width: 4%;
     height: auto;

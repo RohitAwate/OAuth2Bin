@@ -69,6 +69,7 @@ func (s *OA2Server) handleHome(w http.ResponseWriter, r *http.Request) {
 		"public/templates/index.html",
 		"public/templates/nav.html",
 		"public/templates/cards.html",
+		"public/templates/footer.html",
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -85,6 +86,7 @@ func handleNotFound(w http.ResponseWriter, r *http.Request) {
 	tmpl, err := template.ParseFiles(
 		"public/templates/404.html",
 		"public/templates/nav.html",
+		"public/templates/footer.html",
 	)
 	if err != nil {
 		log.Fatal(err)

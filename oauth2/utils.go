@@ -28,6 +28,7 @@ func presentAuthScreen(w http.ResponseWriter, r *http.Request, flow int) {
 	tmpl, err := template.ParseFiles(
 		"public/templates/authScreen.html",
 		"public/templates/nav.html",
+		"public/templates/footer.html",
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -44,6 +45,7 @@ func showError(w http.ResponseWriter, r *http.Request, status int, title string,
 	tmpl, err := template.ParseFiles(
 		"public/templates/error.html",
 		"public/templates/nav.html",
+		"public/templates/footer.html",
 	)
 	if err != nil {
 		log.Fatal(err)
