@@ -31,7 +31,11 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 	conn := cache.NewConn()
 	defer conn.Close()
 
-	items, _ := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
 	for i := 1; i < len(items); i += 2 {
 		err = json.Unmarshal(items[i], &token)
@@ -56,7 +60,12 @@ func grantHousekeep(wg *sync.WaitGroup) {
 	conn := cache.NewConn()
 	defer conn.Close()
 
-	grants, _ := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
+	grants, err := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	for i := 1; i < len(grants); i += 2 {
 		intTime, _ = strconv.ParseInt(grants[i], 10, 64)
 		issueTime = time.Unix(intTime, 0)

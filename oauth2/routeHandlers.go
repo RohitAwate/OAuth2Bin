@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 
@@ -55,7 +56,11 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response := r.FormValue("response")
-	redirectURI := r.FormValue("redirectURI")
+	redirectURI, err := url.QueryUnescape(r.FormValue("redirectURI"))
+	if err != nil {
+		showError(w, r, http.StatusBadRequest, "Bad Request", "Invalid redirect_uri")
+		return
+	}
 
 	if response == "ACCEPT" {
 		switch flow {

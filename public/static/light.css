@@ -143,6 +143,16 @@ dt {
     cursor: pointer;
 }
 
+.alert {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+    background-color: teal;
+    color: white;
+}
+
 .pane {
     margin: 30px;
 }

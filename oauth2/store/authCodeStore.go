@@ -125,14 +125,18 @@ func NewAuthCodeRefreshToken(refreshToken string) (*AuthCodeToken, error) {
 // NewAuthCodeGrant generates a new authorization grant and adds it to a Redis cache set.
 func NewAuthCodeGrant() string {
 	var code string
-	reply := 0
+	var reply = 0
+	var err error
 
 	// In case we get a duplicate value, we iterate until we get a unique one.
 	conn := cache.NewConn()
 	defer conn.Close()
 	for reply == 0 {
 		code = generateNonce(20)
-		reply, _ = redis.Int(conn.Do("HSET", authCodeGrantSet, code, time.Now().Unix()))
+		reply, err = redis.Int(conn.Do("HSET", authCodeGrantSet, code, time.Now().Unix()))
+		if err != nil {
+			log.Println(err)
+		}
 	}
 
 	return code
