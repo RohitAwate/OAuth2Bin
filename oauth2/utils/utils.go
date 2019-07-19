@@ -104,7 +104,7 @@ func ParseParams(url string) (map[string]string, error) {
 	}
 
 	if !strings.Contains(url, "=") {
-		return nil, fmt.Errorf("%s contains no key-value pairs", url)
+		return nil, fmt.Errorf("\"%s\" contains no key-value pairs", url)
 	}
 
 	pairs := make(map[string]string)

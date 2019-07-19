@@ -77,23 +77,13 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 		redirectURI += "?error=access_denied"
 	}
 
-	http.Redirect(w, r, url.QueryEscape(redirectURI), http.StatusSeeOther)
+	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
 }
 
 // Redirects the request to the appropriate flowHandler by checking the 'grant_type' parameter.
 // Refer RFC 6749 Section 4.1.3 (https://tools.ietf.org/html/rfc6749#section-4.1.3)
 // Accepts only POST requests with application/x-www-form-urlencoded body.
 func handleToken(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		utils.ShowJSONError(w, r, 405, struct {
-			Error string `json:"error"`
-		}{Error: r.Method + " not allowed"})
-		return
-	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
-		utils.ShowJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
-		return
-	}
-
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		utils.ShowJSONError(w, r, 500, "An error occurred while processing your request")
