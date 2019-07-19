@@ -1,11 +1,13 @@
-package oauth2
+package server
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
 // handleAuth checks for the existence of client_id in the query parameters.
@@ -18,11 +20,11 @@ func handleAuthCodeAuth(w http.ResponseWriter, r *http.Request) {
 
 	switch clientID {
 	case "":
-		showError(w, r, 400, "Bad Request", "client_id is required")
+		utils.ShowError(w, r, 400, "Bad Request", "client_id is required")
 	case serverConfig.AuthCodeCnfg.ClientID:
-		presentAuthScreen(w, r, AuthCode)
+		utils.PresentAuthScreen(w, r, config.AuthCode)
 	default:
-		showError(w, r, 401, "Unauthorized", "Invalid client_id")
+		utils.ShowError(w, r, 401, "Unauthorized", "Invalid client_id")
 	}
 }
 
@@ -32,7 +34,7 @@ func handleAuthCodeAuth(w http.ResponseWriter, r *http.Request) {
 func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] == "" || params["grant_type"] == "" ||
 		params["redirect_uri"] == "" || params["code"] == "" {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  "client_id, grant_type=authorization_code, code and redirect_uri are required",
 		})
@@ -41,7 +43,7 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 
 	token, err := store.NewAuthCodeToken(params["code"], "")
 	if err != nil {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  err.Error(),
 		})
@@ -57,7 +59,7 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 // Refer RFC 6749 Section 6 (https://tools.ietf.org/html/rfc6749#section-6)
 func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["refresh_token"] == "" {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  "refresh_token required",
 		})
@@ -68,7 +70,7 @@ func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[st
 	if store.AuthCodeRefreshTokenExists(params["refresh_token"], true) {
 		token, err := store.NewAuthCodeRefreshToken(params["refresh_token"])
 		if err != nil {
-			showJSONError(w, r, 500, requestError{
+			utils.ShowJSONError(w, r, 500, utils.RequestError{
 				Error: "Internal Server Error",
 				Desc:  "Token generation failed. Please try again.",
 			})
@@ -80,7 +82,7 @@ func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[st
 
 		fmt.Fprintln(w, string(jsonBytes))
 	} else {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_refresh_token",
 			Desc:  "expired or invalid refresh token",
 		})

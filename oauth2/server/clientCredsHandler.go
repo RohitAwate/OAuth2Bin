@@ -1,4 +1,4 @@
-package oauth2
+package server
 
 import (
 	"encoding/json"
@@ -7,12 +7,13 @@ import (
 	"net/http"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
 func handleClientCredsToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] != serverConfig.ClientCredsCnfg.ClientID ||
 		params["client_secret"] != serverConfig.ClientCredsCnfg.ClientSecret {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  "client_id and client_secret are missing or invalid",
 		})
@@ -24,7 +25,7 @@ func handleClientCredsToken(w http.ResponseWriter, r *http.Request, params map[s
 	if err != nil {
 		log.Println(err)
 		if err != nil {
-			showJSONError(w, r, 500, requestError{
+			utils.ShowJSONError(w, r, 500, utils.RequestError{
 				Error: "Internal Server Error",
 				Desc:  "Token generation failed. Please try again.",
 			})

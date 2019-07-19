@@ -1,4 +1,4 @@
-package oauth2
+package utils
 
 import (
 	"reflect"
@@ -7,7 +7,7 @@ import (
 
 func testParseParamsFunc(url string) func(*testing.T) {
 	return func(t *testing.T) {
-		result, err := parseParams(url)
+		result, err := ParseParams(url)
 		if err != nil {
 			t.Log("Returned an error.")
 			return

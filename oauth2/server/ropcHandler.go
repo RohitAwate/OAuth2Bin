@@ -1,4 +1,4 @@
-package oauth2
+package server
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
 // Checks if the values for username, password, client_id and client_secret match the server presets.
@@ -17,7 +18,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 		params["password"] != serverConfig.ROPCCnfg.Password ||
 		params["client_id"] != serverConfig.ROPCCnfg.ClientID ||
 		params["client_secret"] != serverConfig.ROPCCnfg.ClientSecret {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  "username, password, client_id and client_secret are missing or invalid",
 		})
@@ -29,7 +30,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 	if err != nil {
 		log.Println(err)
 		if err != nil {
-			showJSONError(w, r, 500, requestError{
+			utils.ShowJSONError(w, r, 500, utils.RequestError{
 				Error: "Internal Server Error",
 				Desc:  "Token generation failed. Please try again.",
 			})
@@ -48,7 +49,7 @@ func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string
 	if store.ROPCRefreshTokenExists(params["refresh_token"], true) {
 		token, err := store.NewROPCRefreshToken(params["refresh_token"])
 		if err != nil {
-			showJSONError(w, r, 500, requestError{
+			utils.ShowJSONError(w, r, 500, utils.RequestError{
 				Error: "Internal Server Error",
 				Desc:  "Token generation failed. Please try again.",
 			})
@@ -60,7 +61,7 @@ func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string
 
 		fmt.Fprintln(w, string(jsonBytes))
 	} else {
-		showJSONError(w, r, 400, requestError{
+		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_refresh_token",
 			Desc:  "expired or invalid refresh token",
 		})

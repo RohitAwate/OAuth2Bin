@@ -1,4 +1,4 @@
-package oauth2
+package server
 
 import (
 	"encoding/json"
@@ -10,13 +10,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
 // Routes the request to a AuthorizationHandler based on the request_type
 func handleAuth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		showError(w, r, 405, "Method Not Allowed", r.Method+" not allowed.")
+		utils.ShowError(w, r, 405, "Method Not Allowed", r.Method+" not allowed.")
 		return
 	}
 
@@ -26,7 +28,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	// - response_type
 	// - client_id
 	if params.Get("response_type") == "" || params.Get("client_id") == "" {
-		showError(w, r, 400, "Bad Request", "response_type and client_id are required.")
+		utils.ShowError(w, r, 400, "Bad Request", "response_type and client_id are required.")
 		return
 	}
 
@@ -36,7 +38,7 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 	case "token":
 		handleImplicitAuth(w, r)
 	default:
-		showError(w, r, http.StatusBadRequest, "Authorization Flow Error", "Unknown response_type: "+r.URL.Query().Get("response_type"))
+		utils.ShowError(w, r, http.StatusBadRequest, "Authorization Flow Error", "Unknown response_type: "+r.URL.Query().Get("response_type"))
 	}
 }
 
@@ -44,32 +46,27 @@ func handleAuth(w http.ResponseWriter, r *http.Request) {
 // Extracts the redirect_uri from the JSON body, attaches an authorization grant to it,
 // and redirects the user-agent to that URI.
 func handleResponse(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		showError(w, r, 405, "Method Not Allowed", r.Method+" not allowed.")
-		return
-	}
-
 	flow, err := strconv.Atoi(r.FormValue("flow"))
 	if err != nil {
-		showError(w, r, 400, "OAuth 2.0 Flow Error", "Unrecognized flow")
+		utils.ShowError(w, r, 400, "OAuth 2.0 Flow Error", "Unrecognized flow")
 		return
 	}
 
 	response := r.FormValue("response")
 	redirectURI, err := url.QueryUnescape(r.FormValue("redirectURI"))
 	if err != nil {
-		showError(w, r, http.StatusBadRequest, "Bad Request", "Invalid redirect_uri")
+		utils.ShowError(w, r, http.StatusBadRequest, "Bad Request", "Invalid redirect_uri")
 		return
 	}
 
 	if response == "ACCEPT" {
 		switch flow {
-		case AuthCode:
+		case config.AuthCode:
 			redirectURI += "?code=" + store.NewAuthCodeGrant()
-		case Implicit:
+		case config.Implicit:
 			token, err := store.NewImplicitToken()
 			if err != nil {
-				showError(w, r, 500, "Internal Server Error", "Token generation failed. Please try again.")
+				utils.ShowError(w, r, 500, "Internal Server Error", "Token generation failed. Please try again.")
 				return
 			}
 
@@ -80,7 +77,7 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 		redirectURI += "?error=access_denied"
 	}
 
-	http.Redirect(w, r, redirectURI, http.StatusSeeOther)
+	http.Redirect(w, r, url.QueryEscape(redirectURI), http.StatusSeeOther)
 }
 
 // Redirects the request to the appropriate flowHandler by checking the 'grant_type' parameter.
@@ -88,25 +85,25 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 // Accepts only POST requests with application/x-www-form-urlencoded body.
 func handleToken(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		showJSONError(w, r, 405, struct {
+		utils.ShowJSONError(w, r, 405, struct {
 			Error string `json:"error"`
 		}{Error: r.Method + " not allowed"})
 		return
 	} else if r.Header.Get("Content-Type") != "application/x-www-form-urlencoded" {
-		showJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
+		utils.ShowJSONError(w, r, 400, "Invalid Content-Type: "+r.Header.Get("Content-Type"))
 		return
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		showJSONError(w, r, 500, "An error occurred while processing your request")
+		utils.ShowJSONError(w, r, 500, "An error occurred while processing your request")
 		return
 	}
 
-	params, err := parseParams(string(body))
+	params, err := utils.ParseParams(string(body))
 	if err != nil {
 		fmt.Println(err)
-		showJSONError(w, r, 400, "Expected parameters not found.")
+		utils.ShowJSONError(w, r, 400, "Expected parameters not found.")
 		return
 	}
 
@@ -119,7 +116,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		handleClientCredsToken(w, r, params)
 	case "refresh_token":
 		if len(params["refresh_token"]) != 72 {
-			showJSONError(w, r, 400, "refresh_token missing or invalid")
+			utils.ShowJSONError(w, r, 400, "refresh_token missing or invalid")
 			return
 		}
 
@@ -129,7 +126,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 			handleROPCRefresh(w, r, params)
 		}
 	default:
-		showJSONError(w, r, 400, "grant_type absent or invalid")
+		utils.ShowJSONError(w, r, 400, "grant_type absent or invalid")
 	}
 }
 
@@ -204,7 +201,7 @@ func handleEcho(w http.ResponseWriter, r *http.Request) {
 	jsonStr, err := json.Marshal(response)
 	if err != nil {
 		log.Println(err)
-		showJSONError(w, r, 500, struct {
+		utils.ShowJSONError(w, r, 500, struct {
 			Error string `json:"error"`
 		}{Error: "Error while processing request"})
 	}

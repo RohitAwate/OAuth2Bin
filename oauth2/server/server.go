@@ -1,27 +1,37 @@
-package oauth2
+package server
 
 import (
+	"encoding/json"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/middleware"
 )
 
 // OA2Server implements an OAuth 2.0 server
 type OA2Server struct {
 	Port    string
-	Config  OA2Config
+	Config  config.OA2Config
 	Limiter middleware.RateLimiter
 }
 
-var serverConfig OA2Config
+var serverConfig config.OA2Config
 
 // NewOA2Server returns a new OAuth 2.0 server which runs
 // on the specified port with the specified configuration
-func NewOA2Server(port string, config OA2Config) *OA2Server {
-	serverConfig = config
-	return &OA2Server{Port: port, Config: config}
+func NewOA2Server(port string, serverConfigPath string, ratePoliciesPath string) *OA2Server {
+	serverConfig = *getServerConfig(serverConfigPath)
+	return &OA2Server{
+		Port:   port,
+		Config: serverConfig,
+		Limiter: middleware.RateLimiter{
+			Policies: getRatePolicies(ratePoliciesPath),
+		},
+	}
 }
 
 // SetRateLimiter creates a new RateLimiter which enforces
@@ -37,8 +47,22 @@ func (s *OA2Server) Start() {
 
 	s.route("/", s.handleHome)
 	s.route("/authorize", handleAuth)
-	s.route("/response", handleResponse)
-	s.route("/token", handleToken)
+	s.route("/response", func(w http.ResponseWriter, r *http.Request) {
+		pfv := middleware.PostFormValidator{
+			Request:     r,
+			VisualError: true,
+		}
+
+		pfv.Handle(handleResponse)(w, r)
+	})
+	s.route("/token", func(w http.ResponseWriter, r *http.Request) {
+		pfv := middleware.PostFormValidator{
+			Request:     r,
+			VisualError: false,
+		}
+
+		pfv.Handle(handleToken)(w, r)
+	})
 	s.route("/echo", handleEcho)
 
 	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
@@ -96,4 +120,54 @@ func handleNotFound(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getServerConfig(serverConfigPath string) *config.OA2Config {
+	fd, err := os.Open(serverConfigPath)
+	if err != nil {
+		return nil
+	}
+	defer fd.Close()
+
+	jsonBytes, err := ioutil.ReadAll(fd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(jsonBytes) <= 0 {
+		return nil
+	}
+
+	var config config.OA2Config
+	err = json.Unmarshal(jsonBytes, &config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return &config
+}
+
+func getRatePolicies(ratePoliciesPath string) []middleware.Policy {
+	fd, err := os.Open(ratePoliciesPath)
+	if err != nil {
+		return nil
+	}
+	defer fd.Close()
+
+	jsonBytes, err := ioutil.ReadAll(fd)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(jsonBytes) <= 0 {
+		return nil
+	}
+
+	var policies []middleware.Policy
+	err = json.Unmarshal(jsonBytes, &policies)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return policies
 }
