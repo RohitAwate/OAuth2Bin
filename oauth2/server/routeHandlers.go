@@ -62,7 +62,7 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 	if response == "ACCEPT" {
 		switch flow {
 		case config.AuthCode:
-			redirectURI += "?code=" + store.NewAuthCodeGrant()
+			redirectURI += "?code=" + store.NewAuthCodeGrant(redirectURI)
 		case config.Implicit:
 			token, err := store.NewImplicitToken()
 			if err != nil {

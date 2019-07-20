@@ -32,8 +32,7 @@ func handleAuthCodeAuth(w http.ResponseWriter, r *http.Request) {
 // If not present, an HTTP 400 response is sent.
 // Else a new token is generated, added to the store, and returned to the user in a JSON response.
 func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if params["client_id"] == "" || params["grant_type"] == "" ||
-		params["redirect_uri"] == "" || params["code"] == "" {
+	if params["client_id"] == "" || params["grant_type"] == "" || params["code"] == "" {
 		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
 			Desc:  "client_id, grant_type=authorization_code, code and redirect_uri are required",
@@ -41,7 +40,7 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 		return
 	}
 
-	token, err := store.NewAuthCodeToken(params["code"], "")
+	token, err := store.NewAuthCodeToken(params["code"], "", params["redirect_uri"])
 	if err != nil {
 		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",

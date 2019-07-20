@@ -42,28 +42,32 @@ type authCodeTokenMeta struct {
 // If crossed, an error is thrown.
 // Else a new token is generated and returned.
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
-func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
+func NewAuthCodeToken(code, refreshToken, redirectURI string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
 	conn := cache.NewConn()
 	defer conn.Close()
-	reply, err := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, code))
+
+	value := code + ":" + redirectURI
+
+	reply, err := redis.Int(conn.Do("HEXISTS", authCodeGrantSet, value))
 	if err != nil {
-		log.Println(err)
+		log.Println("NewAuthCodeToken: " + err.Error())
 		return nil, err
 	}
 
-	// If not found in the Redis cache, there are three possibilites:
+	// If 'value' is not found in the Redis cache, there are the following possibilites:
 	// - A token was already issued on this authorization grant and must be revoked.
 	// - It has expired and was removed by housekeep().
 	// - It was never issued.
+	// - the redirect URI is wrong
 	if reply == 0 {
-		return nil, fmt.Errorf("recycled, expired or invalid authorization grant")
+		return nil, fmt.Errorf("recycled/expired/invalid authorization grant or wrong redirect_uri")
 	}
 
 	// If found, check if it has expired since housekeeping runs only every 5 minutes
-	intTime, err := redis.Int64(conn.Do("HGET", authCodeGrantSet, code))
+	intTime, err := redis.Int64(conn.Do("HGET", authCodeGrantSet, value))
 	if err != nil {
-		log.Println(err)
+		log.Println("NewAuthCodeToken: " + err.Error())
 		return nil, err
 	}
 
@@ -74,7 +78,7 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 
 	// If not expired, remove it from the Redis cache since
 	// we're about to issue a token for it.
-	removeAuthCodeGrant(code)
+	go removeAuthCodeGrant(code, redirectURI)
 
 	var token *AuthCodeToken
 	var meta *authCodeTokenMeta
@@ -113,8 +117,8 @@ func NewAuthCodeToken(code, refreshToken string) (*AuthCodeToken, error) {
 // NewAuthCodeRefreshToken returns new token for the previously issued refresh token
 // The refresh token is kept intact and can be used for future requests.
 func NewAuthCodeRefreshToken(refreshToken string) (*AuthCodeToken, error) {
-	code := NewAuthCodeGrant()
-	token, err := NewAuthCodeToken(code, refreshToken)
+	code := NewAuthCodeGrant("")
+	token, err := NewAuthCodeToken(code, refreshToken, "")
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +127,12 @@ func NewAuthCodeRefreshToken(refreshToken string) (*AuthCodeToken, error) {
 }
 
 // NewAuthCodeGrant generates a new authorization grant and adds it to a Redis cache set.
-func NewAuthCodeGrant() string {
+// This function takes the redirect URI as an argument, since RFC 6749 requires the same URI
+// to be used in the token request as was used in the authorization grant request, if any.
+// Thus, we store it along with the authorization grant in order for us to verify it against
+// the one sent in the token request.
+// Refer: https://tools.ietf.org/html/rfc6749#section-4.1.3
+func NewAuthCodeGrant(redirectURI string) string {
 	var code string
 	var reply = 0
 	var err error
@@ -133,7 +142,9 @@ func NewAuthCodeGrant() string {
 	defer conn.Close()
 	for reply == 0 {
 		code = generateNonce(20)
-		reply, err = redis.Int(conn.Do("HSET", authCodeGrantSet, code, time.Now().Unix()))
+		value := code + ":" + redirectURI
+		reply, err = redis.Int(conn.Do("HSET", authCodeGrantSet, value, time.Now().Unix()))
+
 		if err != nil {
 			log.Println(err)
 		}
@@ -186,10 +197,10 @@ func VerifyAuthCodeToken(token string) bool {
 	return err == nil
 }
 
-func removeAuthCodeGrant(code string) {
+func removeAuthCodeGrant(code, redirectURI string) {
 	conn := cache.NewConn()
 	defer conn.Close()
-	conn.Do("HDEL", authCodeGrantSet, code)
+	conn.Do("HDEL", authCodeGrantSet, code+":"+redirectURI)
 }
 
 func invalidateAuthCodeToken(accessToken string) {
