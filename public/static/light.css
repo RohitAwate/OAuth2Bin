@@ -240,3 +240,10 @@ dt {
         margin-top: 20px;
     }
 }
+
+@media screen and (max-width: 780px) {
+    nav {
+        flex-direction: column;
+        text-align: center;
+    }
+}
