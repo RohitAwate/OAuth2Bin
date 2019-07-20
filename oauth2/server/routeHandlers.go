@@ -97,6 +97,12 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if params["client_id"] == "" && params["client_secret"] == "" {
+		clientID, clientSecret := utils.ParseBasicAuthHeader(r.Header.Get("Authorization"))
+		params["client_id"] = clientID
+		params["client_secret"] = clientSecret
+	}
+
 	switch params["grant_type"] {
 	case "authorization_code":
 		handleAuthCodeToken(w, r, params)
