@@ -7,8 +7,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/middleware"
 )
@@ -43,6 +46,32 @@ func (s *OA2Server) SetRateLimiter(policies []middleware.Policy) {
 
 // Start sets up the static file server, handling routes and then starts listening for requests
 func (s *OA2Server) Start() {
+	setupRoutes(s)
+	setupGracefulShutdown()
+
+	log.Printf("OAuth 2.0 Server has started on port %s\n", s.Port)
+	err := http.ListenAndServe(":"+s.Port, nil)
+	if err != nil && err != http.ErrServerClosed {
+		log.Fatalf("Could not start server on port %s\n", s.Port)
+	}
+}
+
+var osSignal chan os.Signal
+
+func setupGracefulShutdown() {
+	osSignal = make(chan os.Signal)
+	signal.Notify(osSignal, syscall.SIGTERM)
+	signal.Notify(osSignal, syscall.SIGINT)
+	go onStopServer()
+}
+
+func onStopServer() {
+	<-osSignal
+	cache.ClosePool()
+	os.Exit(0)
+}
+
+func setupRoutes(s *OA2Server) {
 	public := http.FileServer(http.Dir("public/"))
 	http.Handle("/public/", http.StripPrefix("/public/", public))
 
@@ -65,9 +94,6 @@ func (s *OA2Server) Start() {
 		pfv.Handle(handleToken)(w, r)
 	})
 	s.route("/echo", handleEcho)
-
-	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
-	http.ListenAndServe(":"+s.Port, nil)
 }
 
 // Registers a callback for the specified URL pattern.

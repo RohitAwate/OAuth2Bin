@@ -152,3 +152,9 @@ func ParseBasicAuthHeader(header string) (string, string) {
 
 	return pair[0], pair[1]
 }
+
+// Backspace clears 'places' number of characters from the console
+func Backspace(places int) {
+	str := strings.Repeat("\r \r", places)
+	fmt.Print(str)
+}
