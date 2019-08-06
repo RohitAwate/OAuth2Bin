@@ -29,7 +29,7 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 	var diff time.Duration
 
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
 	if err != nil {
@@ -58,7 +58,7 @@ func grantHousekeep(wg *sync.WaitGroup) {
 	var issueTime time.Time
 
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	grants, err := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
 	if err != nil {

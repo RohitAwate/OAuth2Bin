@@ -34,7 +34,7 @@ type clientCredsTokenMeta struct {
 // in the Redis cache.
 func NewClientCredsToken() (*ClientCredentialsToken, error) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	var token *ClientCredentialsToken
 	var meta *clientCredsTokenMeta
@@ -72,7 +72,7 @@ func NewClientCredsToken() (*ClientCredentialsToken, error) {
 // Returns true if token found, false otherwise.
 func VerifyClientCredsToken(token string) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", clientCredsTokensSet, token))
 	return err == nil
@@ -80,7 +80,7 @@ func VerifyClientCredsToken(token string) bool {
 
 func invalidateClientCredsToken(accessToken string) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	conn.Do("HDEL", clientCredsTokensSet, accessToken)
 }
 

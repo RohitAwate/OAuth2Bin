@@ -35,7 +35,7 @@ type implicitTokenMeta struct {
 // in the Redis cache.
 func NewImplicitToken() (*ImplicitToken, error) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	var token *ImplicitToken
 	var meta *implicitTokenMeta
@@ -73,7 +73,7 @@ func NewImplicitToken() (*ImplicitToken, error) {
 // Returns true if token found, false otherwise.
 func VerifyImplicitToken(token string) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", implicitTokensSet, token))
 	return err == nil
@@ -81,7 +81,7 @@ func VerifyImplicitToken(token string) bool {
 
 func invalidateImplicitToken(accessToken string) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	conn.Do("HDEL", implicitTokensSet, accessToken)
 }
 

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/middleware"
@@ -66,7 +67,7 @@ func (s *OA2Server) Start() {
 	s.route("/echo", handleEcho)
 
 	log.Printf("OAuth 2.0 Server has started on port %s.\n", s.Port)
-	http.ListenAndServe("0.0.0.0:"+s.Port, nil)
+	http.ListenAndServe(":"+s.Port, nil)
 }
 
 // Registers a callback for the specified URL pattern.
@@ -142,6 +143,11 @@ func getServerConfig(serverConfigPath string) *config.OA2Config {
 	err = json.Unmarshal(jsonBytes, &config)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Remove trailing "/" in the URL, if any
+	if strings.HasSuffix(config.BaseURL, "/") {
+		config.BaseURL = config.BaseURL[:len(config.BaseURL)-1]
 	}
 
 	return &config

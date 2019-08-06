@@ -35,7 +35,7 @@ type ropcTokenMeta struct {
 // in the Redis cache.
 func NewROPCToken(refreshToken string) (*ROPCToken, error) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	var token *ROPCToken
 	var meta *ropcTokenMeta
@@ -94,7 +94,7 @@ func NewROPCRefreshToken(refreshToken string) (*ROPCToken, error) {
 // invalidateIfFound: if true, the token is invalidated if found
 func ROPCRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	var token ropcTokenStruct
 	items, err := redis.ByteSlices(conn.Do("HGETALL", ropcTokensSet))
@@ -125,7 +125,7 @@ func ROPCRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 // Returns true if token found, false otherwise.
 func VerifyROPCToken(token string) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", ropcTokensSet, token))
 	return err == nil
@@ -133,7 +133,7 @@ func VerifyROPCToken(token string) bool {
 
 func invalidateROPCToken(accessToken string) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	conn.Do("HDEL", ropcTokensSet, accessToken)
 }
 

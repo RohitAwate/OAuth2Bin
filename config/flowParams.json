@@ -1,23 +1,19 @@
 {
+    "baseURL": "http://localhost:8080",
     "authCode": {
-        "authURL": "http://localhost:8080/authorize",
-        "tokenURL": "http://localhost:8080/token",
         "clientID": "clientID",
         "clientSecret": "clientSecret"
     },
     "implicit": {
-        "authURL": "http://localhost:8080/authorize",
         "clientID": "clientID"
     },
     "ropc": {
-        "tokenURL": "http://localhost:8080/token",
         "username": "oa2buser",
         "password": "oa2bpass",
         "clientID": "clientID",
         "clientSecret": "clientSecret"
     },
     "clientCreds": {
-        "tokenURL": "http://localhost:8080/token",
         "clientID": "clientID",
         "clientSecret": "clientSecret"
     }

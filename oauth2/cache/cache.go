@@ -16,6 +16,23 @@ func NewConn() redis.Conn {
 	return pool.Get()
 }
 
+// CloseConn closes a Redis connection.
+// Also captures the error, if any, and logs it.
+func CloseConn(conn redis.Conn) {
+	err := conn.Close()
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+// Initializes a pool a connections with Redis.
+// Based on certain environment variables, it decides which Redis
+// server to connect to.
+//
+// If:
+// - DOCKER is defined, connects to a Redis container.
+// - REDIS_HOST, REDIS_PASS and REDIS_PORT are defined, connects to that server.
+// - none of these are defined, connects to a local Redis server.
 func init() {
 	pool = redis.Pool{
 		MaxActive: 30,

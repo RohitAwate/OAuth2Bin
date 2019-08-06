@@ -45,7 +45,7 @@ type authCodeTokenMeta struct {
 func NewAuthCodeToken(code, refreshToken, redirectURI string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	value := code + ":" + redirectURI
 
@@ -139,7 +139,7 @@ func NewAuthCodeGrant(redirectURI string) string {
 
 	// In case we get a duplicate value, we iterate until we get a unique one.
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	for reply == 0 {
 		code = generateNonce(20)
 		value := code + ":" + redirectURI
@@ -160,7 +160,7 @@ func NewAuthCodeGrant(redirectURI string) string {
 // invalidateIfFound: if true, the token is invalidated if found
 func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	var token authCodeTokenStruct
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
@@ -191,7 +191,7 @@ func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) boo
 // Returns true if token found, false otherwise.
 func VerifyAuthCodeToken(token string) bool {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", authCodeTokensSet, token))
 	return err == nil
@@ -199,13 +199,13 @@ func VerifyAuthCodeToken(token string) bool {
 
 func removeAuthCodeGrant(code, redirectURI string) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	conn.Do("HDEL", authCodeGrantSet, code+":"+redirectURI)
 }
 
 func invalidateAuthCodeToken(accessToken string) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 	conn.Do("HDEL", authCodeTokensSet, accessToken)
 }
 

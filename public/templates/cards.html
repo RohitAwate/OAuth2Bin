@@ -10,9 +10,9 @@
             <h3>Flow Parameters</h3>
             <dl>
                 <dt>Authorization URL</dt>
-                <dd class="copy">{{.AuthCodeCnfg.AuthURL}}</dd>
+                <dd class="copy">{{.BaseURL}}/authorize</dd>
                 <dt>Access Token URL</dt>
-                <dd class="copy">{{.AuthCodeCnfg.TokenURL}}</dd>
+                <dd class="copy">{{.BaseURL}}/token</dd>
                 <dt>Client ID</dt>
                 <dd class="copy">{{.AuthCodeCnfg.ClientID}}</dd>
                 <dt>Client Secret</dt>
@@ -73,7 +73,7 @@
             <h3>Flow Parameters</h3>
             <dl>
                 <dt>Authorization URL</dt>
-                <dd class="copy">{{.ImplicitCnfg.AuthURL}}</dd>
+                <dd class="copy">{{.BaseURL}}/authorize</dd>
                 <dt>Client ID</dt>
                 <dd class="copy">{{.ImplicitCnfg.ClientID}}</dd>
             </dl>
@@ -113,7 +113,7 @@
             <h3>Flow Parameters</h3>
             <dl>
                 <dt>Access Token URL</dt>
-                <dd class="copy">{{.ROPCCnfg.TokenURL}}</dd>
+                <dd class="copy">{{.BaseURL}}/token</dd>
                 <dt>Username</dt>
                 <dd class="copy">{{.ROPCCnfg.Username}}</dd>
                 <dt>Password</dt>
@@ -167,7 +167,7 @@
             <h3>Flow Parameters</h3>
             <dl>
                 <dt>Token URL</dt>
-                <dd class="copy">{{.ClientCredsCnfg.TokenURL}}</dd>
+                <dd class="copy">{{.BaseURL}}/token</dd>
                 <dt>Client ID</dt>
                 <dd class="copy">{{.ClientCredsCnfg.ClientID}}</dd>
             </dl>

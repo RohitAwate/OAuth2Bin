@@ -69,7 +69,7 @@ func (rl *RateLimiter) getPolicy(route string) *Policy {
 // Returns the current hit count or an error.
 func setHit(policy *Policy, ip string) (int, error) {
 	conn := cache.NewConn()
-	defer conn.Close()
+	defer cache.CloseConn(conn)
 
 	key := fmt.Sprintf("%s:%s", policy.Route, ip)
 	res, err := redis.String(conn.Do("GET", key))
