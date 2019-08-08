@@ -96,24 +96,19 @@ OA2B uses the `config/flowParams.json` file for configuring the server endpoints
 It expects separate configurations for every OAuth 2.0 flow in the form of JSON objects. The following parameters are required:
 
 - **Authorization Code**
-    - `authURL` Authorization URL
-    - `tokenURL` Access Token URL
     - `clientID` Predefined client ID for all requests
     - `clientSecret` Predefined client secret for all requests
 
 - **Implicit Grant**
-    - `authURL` Authorization URL
     - `clientID` Predefined client ID for all requests
 
 - **Resource Owner Password Credentials**
-    - `tokenURL` Access Token URL
     - `username` Predefined username for all requests
     - `password` Predefined password for all requests
     - `clientID` Predefined client ID for all requests
     - `clientSecret` Predefined client secret for all requests
 
 - **Client Credentials**
-    - `tokenURL` Access Token URL
     - `clientID` Predefined client ID for all requests
     - `clientSecret` Predefined client secret for all requests
 
@@ -125,14 +120,14 @@ If a policy is not provided for a certain route, OA2B **does not** impose any de
 A policy is defined by the following parameters, specified as a JSON object:
 - `route` The route to apply the policy to
 - `limit` Maximum number of requests permitted within a period
-- `period` Time period in minutes over which the limit is imposed
+- `minutes` Time period in minutes over which the limit is imposed
 
 #### Example 
 ```json
 {
     "route": "/example",
     "limit": 100,
-    "period": 30
+    "minutes": 30
 }
 
 // For the /example route, allow 100 requests per 30 minutes per IP address

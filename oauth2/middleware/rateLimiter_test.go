@@ -12,9 +12,9 @@ import (
 func TestLimiterHandle(t *testing.T) {
 	policies := make([]Policy, 1)
 	policies[0] = Policy{
-		Route:     "/",
-		Limit:     50,
-		PeriodMin: 1,
+		Route:   "/",
+		Limit:   50,
+		Minutes: 1,
 	}
 
 	limiter := RateLimiter{Policies: policies}

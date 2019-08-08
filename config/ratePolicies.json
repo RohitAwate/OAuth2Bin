@@ -2,16 +2,16 @@
     {
         "route": "/response",
         "limit": 10,
-        "period": 60
+        "minutes": 60
     },
     {
         "route": "/token",
         "limit": 5,
-        "period": 60
+        "minutes": 60
     },
     {
         "route": "/echo",
         "limit": 50,
-        "period": 30
+        "minutes": 30
     }
 ]

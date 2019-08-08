@@ -13,11 +13,11 @@ import (
 //
 // Route: the server route to apply the policy to
 // Limit: the number of API calls allowed
-// PeriodMin: the duration over which the Limit is imposed
+// Minutes: the duration in minutes over which 'Limit' is imposed
 type Policy struct {
-	Route     string `json:"route"`
-	Limit     int    `json:"limit"`
-	PeriodMin int    `json:"period"`
+	Route   string `json:"route"`
+	Limit   int    `json:"limit"`
+	Minutes int    `json:"minutes"`
 }
 
 // RateLimiter is an implementation of Middleware.
@@ -79,7 +79,7 @@ func setHit(policy *Policy, ip string) (int, error) {
 		return redis.Int(conn.Do("INCR", key))
 		// else, set key with value 1 and set TTL according to policy
 	} else if res == "" && err == redis.ErrNil {
-		res, err = redis.String(conn.Do("SET", key, 1, "EX", policy.PeriodMin*60))
+		res, err = redis.String(conn.Do("SET", key, 1, "EX", policy.Minutes*60))
 		if res == "OK" {
 			return 1, nil
 		}
@@ -90,5 +90,5 @@ func setHit(policy *Policy, ip string) (int, error) {
 
 func showError(policy *Policy, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTooManyRequests)
-	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minute(s) on this route.\n", policy.Limit, policy.PeriodMin)
+	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minute(s) on this route.\n", policy.Limit, policy.Minutes)
 }
