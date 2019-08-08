@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
+
 	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
@@ -21,15 +23,10 @@ type ropcTokenStruct struct {
 	Meta  ropcTokenMeta `json:"meta"`
 }
 
-func tokenHousekeep(wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func tokenHousekeep(conn redis.Conn) {
 	var token authCodeTokenStruct
 	var err error
 	var diff time.Duration
-
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
 
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
 	if err != nil {
@@ -51,14 +48,9 @@ func tokenHousekeep(wg *sync.WaitGroup) {
 	}
 }
 
-func grantHousekeep(wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func grantHousekeep(conn redis.Conn) {
 	var intTime int64
 	var issueTime time.Time
-
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
 
 	grants, err := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
 	if err != nil {
@@ -76,19 +68,27 @@ func grantHousekeep(wg *sync.WaitGroup) {
 	}
 }
 
+var housekeepingFuncs = [...]func(redis.Conn){
+	tokenHousekeep, grantHousekeep,
+}
+
+var wg sync.WaitGroup
+
 func init() {
-	// Background goroutine that fires the housekeeping function every
+	// Background goroutine that fires the housekeeping functions every
 	// 5 minutes for cleaning up expired grants and tokens.
 	go func() {
-		log.Println("Housekeeping service has started.")
-		timer := time.NewTimer(5 * time.Minute)
-		wg := sync.WaitGroup{}
+		log.Println("Housekeeping service has started")
+		conn := cache.NewConn()
+
 		for {
-			wg.Add(2)
-			go tokenHousekeep(&wg)
-			go grantHousekeep(&wg)
-			wg.Wait()
-			<-timer.C
+			for i := 0; i < len(housekeepingFuncs); i++ {
+				wg.Add(1)
+				housekeepingFuncs[i](conn)
+				wg.Done()
+			}
+
+			utils.Sleep(5 * time.Second)
 		}
 	}()
 }

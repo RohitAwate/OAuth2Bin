@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 )
 
 // PresentAuthScreen shows the authorization screen to the user
@@ -153,8 +154,12 @@ func ParseBasicAuthHeader(header string) (string, string) {
 	return pair[0], pair[1]
 }
 
-// Backspace clears 'places' number of characters from the console
-func Backspace(places int) {
-	str := strings.Repeat("\r \r", places)
-	fmt.Print(str)
+// Clearln clears the last line from the console output
+func Clearln() {
+	fmt.Print("\r \r")
+}
+
+// Sleep pauses the current goroutine for the specified duration
+func Sleep(duration time.Duration) {
+	<-time.NewTimer(duration).C
 }
