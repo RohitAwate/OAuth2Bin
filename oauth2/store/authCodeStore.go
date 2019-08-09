@@ -261,7 +261,10 @@ func authCodeTokenHousekeep(conn redis.Conn) {
 
 		diff = time.Now().Sub(token.Meta.CreationTime)
 		if diff >= time.Hour {
-			conn.Do("HDEL", authCodeTokensSet, items[i-1])
+			_, err := conn.Do("HDEL", authCodeTokensSet, items[i-1])
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }
@@ -282,7 +285,10 @@ func authCodeGrantHousekeep(conn redis.Conn) {
 		issueTime = time.Unix(intTime, 0)
 
 		if time.Now().Sub(issueTime) >= time.Minute*10 {
-			conn.Do("HDEL", authCodeGrantSet, grants[i-1])
+			_, err = conn.Do("HDEL", authCodeGrantSet, grants[i-1])
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }

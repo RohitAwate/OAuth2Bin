@@ -187,7 +187,10 @@ func ropcTokenHousekeep(conn redis.Conn) {
 
 		diff = time.Now().Sub(token.Meta.CreationTime)
 		if diff >= time.Hour {
-			conn.Do("HDEL", ropcTokensSet, items[i-1])
+			_, err = conn.Do("HDEL", ropcTokensSet, items[i-1])
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }

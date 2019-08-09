@@ -129,7 +129,10 @@ func clientCredsTokenHousekeep(conn redis.Conn) {
 
 		diff = time.Now().Sub(token.Meta.CreationTime)
 		if diff >= time.Hour {
-			conn.Do("HDEL", clientCredsTokensSet, items[i-1])
+			_, err = conn.Do("HDEL", clientCredsTokensSet, items[i-1])
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 }
