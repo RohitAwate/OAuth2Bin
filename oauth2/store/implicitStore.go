@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	// Redis HSET which holds the issued tokens
 	implicitTokensSet = "OA2B_IG_Tokens"
 
 	// ImplicitFlowID is prepended to access tokens issued by the Implicit Grant flow
@@ -25,9 +26,17 @@ type ImplicitToken struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+// Holds the meta data of an access token
 type implicitTokenMeta struct {
 	CreationTime time.Time `json:"creation_time"`
 	Nonce        string    `json:"nonce"`
+}
+
+// Holds the token as well as its metadata.
+// It is the internal representation of the token inside the Redis cache.
+type internalImplicitToken struct {
+	Token ImplicitToken     `json:"token"`
+	Meta  implicitTokenMeta `json:"meta"`
 }
 
 // NewImplicitToken issues new access tokens for the Implicit Grant flow.
@@ -53,10 +62,7 @@ func NewImplicitToken() (*ImplicitToken, error) {
 		}
 	}
 
-	jsonBytes, err := json.Marshal(struct {
-		Token ImplicitToken     `json:"token"`
-		Meta  implicitTokenMeta `json:"meta"`
-	}{Token: *token, Meta: *meta})
+	jsonBytes, err := json.Marshal(internalImplicitToken{Token: *token, Meta: *meta})
 	if err != nil {
 		panic(err)
 	}
@@ -101,4 +107,30 @@ func generateImplicitToken() (*ImplicitToken, *implicitTokenMeta) {
 			CreationTime: creationTime,
 			Nonce:        nonce,
 		}
+}
+
+// Housekeeping service for the Implicit tokens set
+func implicitTokenHousekeep(conn redis.Conn) {
+	var token internalImplicitToken
+	var err error
+	var diff time.Duration
+
+	items, err := redis.ByteSlices(conn.Do("HGETALL", implicitTokensSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for i := 1; i < len(items); i += 2 {
+		err = json.Unmarshal(items[i], &token)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		diff = time.Now().Sub(token.Meta.CreationTime)
+		if diff >= time.Hour {
+			conn.Do("HDEL", implicitTokensSet, items[i-1])
+		}
+	}
 }

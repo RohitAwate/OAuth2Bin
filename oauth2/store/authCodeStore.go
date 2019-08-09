@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
@@ -29,11 +30,18 @@ type AuthCodeToken struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
-// authCodeTokenMeta holds the meta data of an access token
+// Holds the meta data of an access token
 type authCodeTokenMeta struct {
 	AuthGrant    string    `json:"auth_grant"`
 	CreationTime time.Time `json:"creation_time"`
 	Nonce        string    `json:"nonce"`
+}
+
+// Holds the token as well as its metadata.
+// It is the internal representation of the token inside the Redis cache.
+type internalAuthCodeToken struct {
+	Token AuthCodeToken     `json:"token"`
+	Meta  authCodeTokenMeta `json:"meta"`
 }
 
 // NewAuthCodeToken issues new access tokens for the Authorization Code flow.
@@ -101,7 +109,7 @@ func NewAuthCodeToken(code, refreshToken, redirectURI string) (*AuthCodeToken, e
 		}
 	}
 
-	jsonBytes, err := json.Marshal(authCodeTokenStruct{Token: *token, Meta: *meta})
+	jsonBytes, err := json.Marshal(internalAuthCodeToken{Token: *token, Meta: *meta})
 	if err != nil {
 		panic(err)
 	}
@@ -162,7 +170,7 @@ func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) boo
 	conn := cache.NewConn()
 	defer cache.CloseConn(conn)
 
-	var token authCodeTokenStruct
+	var token internalAuthCodeToken
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
 	if err != nil {
 		log.Println(err)
@@ -230,4 +238,51 @@ func generateAuthCodeToken(code string) (*AuthCodeToken, *authCodeTokenMeta) {
 			CreationTime: creationTime,
 			Nonce:        nonce,
 		}
+}
+
+// Housekeeping service for the Auth Code tokens set
+func authCodeTokenHousekeep(conn redis.Conn) {
+	var token internalAuthCodeToken
+	var err error
+	var diff time.Duration
+
+	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for i := 1; i < len(items); i += 2 {
+		err = json.Unmarshal(items[i], &token)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		diff = time.Now().Sub(token.Meta.CreationTime)
+		if diff >= time.Hour {
+			conn.Do("HDEL", authCodeTokensSet, items[i-1])
+		}
+	}
+}
+
+// Housekeeping service for the Auth Code tokens set
+func authCodeGrantHousekeep(conn redis.Conn) {
+	var intTime int64
+	var issueTime time.Time
+
+	grants, err := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for i := 1; i < len(grants); i += 2 {
+		intTime, _ = strconv.ParseInt(grants[i], 10, 64)
+		issueTime = time.Unix(intTime, 0)
+
+		if time.Now().Sub(issueTime) >= time.Minute*10 {
+			conn.Do("HDEL", authCodeGrantSet, grants[i-1])
+		}
+	}
 }

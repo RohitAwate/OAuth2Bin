@@ -1,78 +1,21 @@
 package store
 
 import (
-	"encoding/json"
 	"log"
-	"strconv"
 	"sync"
 	"time"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
-
 	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 	"github.com/gomodule/redigo/redis"
 )
 
-type authCodeTokenStruct struct {
-	Token AuthCodeToken     `json:"token"`
-	Meta  authCodeTokenMeta `json:"meta"`
-}
-
-type ropcTokenStruct struct {
-	Token ROPCToken     `json:"token"`
-	Meta  ropcTokenMeta `json:"meta"`
-}
-
-func tokenHousekeep(conn redis.Conn) {
-	var token authCodeTokenStruct
-	var err error
-	var diff time.Duration
-
-	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for i := 1; i < len(items); i += 2 {
-		err = json.Unmarshal(items[i], &token)
-		if err != nil {
-			log.Println(err)
-			break
-		}
-
-		diff = time.Now().Sub(token.Meta.CreationTime)
-		if diff >= time.Hour {
-			conn.Do("HDEL", authCodeTokensSet, items[i-1])
-		}
-	}
-}
-
-func grantHousekeep(conn redis.Conn) {
-	var intTime int64
-	var issueTime time.Time
-
-	grants, err := redis.Strings(conn.Do("HGETALL", authCodeGrantSet))
-	if err != nil {
-		log.Println(err)
-		return
-	}
-
-	for i := 1; i < len(grants); i += 2 {
-		intTime, _ = strconv.ParseInt(grants[i], 10, 64)
-		issueTime = time.Unix(intTime, 0)
-
-		if time.Now().Sub(issueTime) >= time.Minute*10 {
-			conn.Do("HDEL", authCodeGrantSet, grants[i-1])
-		}
-	}
-}
-
+// Array of housekeeping service functions
 var housekeepingFuncs = [...]func(redis.Conn){
-	tokenHousekeep, grantHousekeep,
+	authCodeTokenHousekeep, authCodeGrantHousekeep,
+	implicitTokenHousekeep, ropcTokenHousekeep,
+	clientCredsTokenHousekeep,
 }
-
-var wg sync.WaitGroup
 
 func init() {
 	// Background goroutine that fires the housekeeping functions every
@@ -80,11 +23,12 @@ func init() {
 	go func() {
 		log.Println("Housekeeping service has started")
 		conn := cache.NewConn()
+		wg := sync.WaitGroup{}
 
 		for {
-			for i := 0; i < len(housekeepingFuncs); i++ {
+			for _, hkFunc := range housekeepingFuncs {
 				wg.Add(1)
-				housekeepingFuncs[i](conn)
+				hkFunc(conn)
 				wg.Done()
 			}
 

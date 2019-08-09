@@ -11,6 +11,7 @@ import (
 )
 
 const (
+	// Redis HSET which holds the issued tokens
 	clientCredsTokensSet = "OA2B_CC_Tokens"
 
 	// ClientCredsFlowID is prepended to access and refresh tokens issued by the Client Credentials flow
@@ -24,9 +25,17 @@ type ClientCredentialsToken struct {
 	ExpiresIn   int    `json:"expires_in"`
 }
 
+// Holds the meta data of an access token
 type clientCredsTokenMeta struct {
 	CreationTime time.Time `json:"creation_time"`
 	Nonce        string    `json:"nonce"`
+}
+
+// Holds the token as well as its metadata.
+// It is the internal representation of the token inside the Redis cache.
+type internalClientCredsToken struct {
+	Token ClientCredentialsToken `json:"token"`
+	Meta  clientCredsTokenMeta   `json:"meta"`
 }
 
 // NewClientCredsToken issues new access tokens for the Client Credentials flow.
@@ -52,10 +61,7 @@ func NewClientCredsToken() (*ClientCredentialsToken, error) {
 		}
 	}
 
-	jsonBytes, err := json.Marshal(struct {
-		Token ClientCredentialsToken `json:"token"`
-		Meta  clientCredsTokenMeta   `json:"meta"`
-	}{Token: *token, Meta: *meta})
+	jsonBytes, err := json.Marshal(internalClientCredsToken{Token: *token, Meta: *meta})
 	if err != nil {
 		panic(err)
 	}
@@ -100,4 +106,30 @@ func generateClientCredsToken() (*ClientCredentialsToken, *clientCredsTokenMeta)
 			CreationTime: creationTime,
 			Nonce:        nonce,
 		}
+}
+
+// Housekeeping service for the Client Credentials tokens set
+func clientCredsTokenHousekeep(conn redis.Conn) {
+	var token internalClientCredsToken
+	var err error
+	var diff time.Duration
+
+	items, err := redis.ByteSlices(conn.Do("HGETALL", clientCredsTokensSet))
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
+	for i := 1; i < len(items); i += 2 {
+		err = json.Unmarshal(items[i], &token)
+		if err != nil {
+			log.Println(err)
+			break
+		}
+
+		diff = time.Now().Sub(token.Meta.CreationTime)
+		if diff >= time.Hour {
+			conn.Do("HDEL", clientCredsTokensSet, items[i-1])
+		}
+	}
 }
