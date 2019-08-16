@@ -13,6 +13,6 @@ func main() {
 		port = "8080"
 	}
 
-	server := server.NewOA2Server(port, "config/flowParams.json", "config/ratePolicies.json")
+	server := server.NewOA2Server(port, "config/flowParams.json", "config/ratePolicies.csv")
 	server.Start()
 }

@@ -1,13 +1,16 @@
 package server
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"html/template"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"strings"
 	"syscall"
 
@@ -149,6 +152,7 @@ func handleNotFound(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Reads the server config from the specified path and returns it
 func getServerConfig(serverConfigPath string) *config.OA2Config {
 	fd, err := os.Open(serverConfigPath)
 	if err != nil {
@@ -179,27 +183,84 @@ func getServerConfig(serverConfigPath string) *config.OA2Config {
 	return &config
 }
 
+// Reads the IP rate limiting policies from the specified file and
+// returns them as an array, returns nil in case something goes wrong
 func getRatePolicies(ratePoliciesPath string) []middleware.Policy {
+	// Opens the file, reads the contents.
 	fd, err := os.Open(ratePoliciesPath)
 	if err != nil {
+		log.Println("Could not read rate policies.")
 		return nil
 	}
 	defer fd.Close()
 
-	jsonBytes, err := ioutil.ReadAll(fd)
+	data, err := ioutil.ReadAll(fd)
 	if err != nil {
-		log.Fatal(err)
-	}
-
-	if len(jsonBytes) <= 0 {
+		log.Println("Could not read rate policies.")
 		return nil
 	}
 
-	var policies []middleware.Policy
-	err = json.Unmarshal(jsonBytes, &policies)
+	if len(data) <= 0 {
+		return nil
+	}
+
+	// First, attempts to parse those contents as JSON.
+	// If it works, returns the policies.
+	policies, err := parseJSONPolicies(data)
+	if err == nil {
+		return policies
+	}
+
+	// Rewinding the file read pointer since the file may
+	// already be consumed till the end by parseJSONPolicies.
+	fd.Seek(0, io.SeekStart)
+
+	// Attempts to parse the file as CSV
+	policies, err = parseCSVPolicies(fd)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Unknown format for rate policies. JSON or CSV supported.")
+		return nil
 	}
 
 	return policies
+}
+
+// Tries to parse the given data into an array of policies assuming that the format is JSON
+func parseJSONPolicies(data []byte) ([]middleware.Policy, error) {
+	var policies []middleware.Policy
+	err := json.Unmarshal(data, &policies)
+	if err != nil {
+		return nil, err
+	}
+
+	return policies, nil
+}
+
+// Tries to parse the given data into an array of policies assuming that the format is CSV
+func parseCSVPolicies(fd *os.File) ([]middleware.Policy, error) {
+	lines, err := csv.NewReader(fd).ReadAll()
+	if err != nil {
+		return nil, err
+	}
+
+	policies := make([]middleware.Policy, len(lines))
+	for i, line := range lines {
+		limit, err := strconv.Atoi(strings.TrimSpace(line[1]))
+		if err != nil {
+			log.Fatalf("Expect integer value for policy rate limit: %s" + err.Error())
+		}
+
+		minutes, err := strconv.Atoi(strings.TrimSpace(line[2]))
+		if err != nil {
+			log.Fatalf("Expect integer value for policy time limit: %s" + err.Error())
+		}
+
+		policies[i] = middleware.Policy{
+			Route:   strings.TrimSpace(line[0]),
+			Limit:   limit,
+			Minutes: minutes,
+		}
+	}
+
+	return policies, nil
 }
