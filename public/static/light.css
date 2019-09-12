@@ -223,6 +223,11 @@ dt {
     margin: 20px 0px;
 }
 
+.btn:hover {
+    filter: brightness(120%);
+    cursor: pointer;
+}
+
 #cancel-btn {
     background-color: #404040;
     color: white;
