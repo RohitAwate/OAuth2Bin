@@ -134,4 +134,4 @@ A policy is defined by the following parameters, specified as a JSON object:
 ```
 
 # License
-OAuth 2.0 Bin is licensed under the [MIT License](LICENSE).
+OAuth 2.0 Bin is licensed under the [Apache 2.0 License](LICENSE).

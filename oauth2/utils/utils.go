@@ -6,25 +6,67 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"math/rand"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
 )
 
-// PresentAuthScreen shows the authorization screen to the user
-func PresentAuthScreen(w http.ResponseWriter, r *http.Request, flow int) {
-	scopeList := []string{
-		"Fly to Mars",
-		"Travel back in time",
-		"Ride a dragon",
+var scopeList = []string{
+	"Fly to Mars", "Travel back in time", "Ride a dragon",
+	"Go the center of the Earth", "Be Batman", "Run faster than light",
+	"Live forever", "Be invisible", "Summon a genie",
+	"Discover a lost city", "Stop global warming", "See into the future",
+}
+
+// Returns a string slice containing 'count' number of
+// unique strings selected at random from scopeList.
+func getRandomUniqueScopes(count int) []string {
+	if count >= len(scopeList) {
+		return scopeList
 	}
 
+	// Create Go's equivalent of a set to store the unique indices
+	// of the strings to be selected from scopeList
+	var indices = make(map[int]struct{})
+
+	// Loop until we have 'count' number of unique indices
+	for {
+		// Select a random index
+		r := rand.Int() % len(scopeList)
+
+		// Check if it has already been added to the set
+		if _, found := indices[r]; !found {
+			// If not, add it to the set
+			indices[r] = struct{}{}
+
+			// Stop if we have 'count' number of indices
+			if len(indices) >= count {
+				break
+			}
+		}
+	}
+
+	// Generate a string slice with the scope strings
+	// corresponding to the generated unique indices
+	var scopes = make([]string, count)
+	i := 0
+	for j := range indices {
+		scopes[i] = scopeList[j]
+		i = i + 1
+	}
+
+	return scopes
+}
+
+// PresentAuthScreen shows the authorization screen to the user
+func PresentAuthScreen(w http.ResponseWriter, r *http.Request, flow int) {
 	authScreenStruct := struct {
 		ScopeList []string
 		Flow      int
 	}{
-		ScopeList: scopeList,
+		ScopeList: getRandomUniqueScopes(3),
 		Flow:      flow,
 	}
 
