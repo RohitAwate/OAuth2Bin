@@ -43,7 +43,7 @@ func NewOA2Server(port string, serverConfigPath string, ratePoliciesPath string)
 
 // SetRateLimiter creates a new RateLimiter which enforces
 // the policies passed.
-func (s *OA2Server) SetRateLimiter(policies []middleware.Policy) {
+func (s *OA2Server) SetRateLimiter(policies []middleware.RatePolicy) {
 	s.Limiter = middleware.RateLimiter{Policies: policies}
 }
 
@@ -185,7 +185,7 @@ func getServerConfig(serverConfigPath string) *config.OA2Config {
 
 // Reads the IP rate limiting policies from the specified file and
 // returns them as an array, returns nil in case something goes wrong
-func getRatePolicies(ratePoliciesPath string) []middleware.Policy {
+func getRatePolicies(ratePoliciesPath string) []middleware.RatePolicy {
 	// Opens the file, reads the contents.
 	fd, err := os.Open(ratePoliciesPath)
 	if err != nil {
@@ -226,8 +226,8 @@ func getRatePolicies(ratePoliciesPath string) []middleware.Policy {
 }
 
 // Tries to parse the given data into an array of policies assuming that the format is JSON
-func parseJSONPolicies(data []byte) ([]middleware.Policy, error) {
-	var policies []middleware.Policy
+func parseJSONPolicies(data []byte) ([]middleware.RatePolicy, error) {
+	var policies []middleware.RatePolicy
 	err := json.Unmarshal(data, &policies)
 	if err != nil {
 		return nil, err
@@ -237,13 +237,13 @@ func parseJSONPolicies(data []byte) ([]middleware.Policy, error) {
 }
 
 // Tries to parse the given data into an array of policies assuming that the format is CSV
-func parseCSVPolicies(fd *os.File) ([]middleware.Policy, error) {
+func parseCSVPolicies(fd *os.File) ([]middleware.RatePolicy, error) {
 	lines, err := csv.NewReader(fd).ReadAll()
 	if err != nil {
 		return nil, err
 	}
 
-	policies := make([]middleware.Policy, len(lines))
+	policies := make([]middleware.RatePolicy, len(lines))
 	for i, line := range lines {
 		limit, err := strconv.Atoi(strings.TrimSpace(line[1]))
 		if err != nil {
@@ -255,7 +255,7 @@ func parseCSVPolicies(fd *os.File) ([]middleware.Policy, error) {
 			log.Fatalf("Expect integer value for policy time limit: %s" + err.Error())
 		}
 
-		policies[i] = middleware.Policy{
+		policies[i] = middleware.RatePolicy{
 			Route:   strings.TrimSpace(line[0]),
 			Limit:   limit,
 			Minutes: minutes,

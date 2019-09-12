@@ -10,8 +10,8 @@ import (
 )
 
 func TestLimiterHandle(t *testing.T) {
-	policies := make([]Policy, 1)
-	policies[0] = Policy{
+	policies := make([]RatePolicy, 1)
+	policies[0] = RatePolicy{
 		Route:   "/",
 		Limit:   50,
 		Minutes: 1,

@@ -8,13 +8,13 @@ import (
 	"github.com/gomodule/redigo/redis"
 )
 
-// Policy represents the rate limiting policy
+// RatePolicy represents the rate limiting policy
 // for a specific route.
 //
 // Route: the server route to apply the policy to
 // Limit: the number of API calls allowed
 // Minutes: the duration in minutes over which 'Limit' is imposed
-type Policy struct {
+type RatePolicy struct {
 	Route   string `json:"route"`
 	Limit   int    `json:"limit"`
 	Minutes int    `json:"minutes"`
@@ -24,14 +24,14 @@ type Policy struct {
 // It holds a list of policies that are checked
 // when the CheckLimit method is invoked.
 type RateLimiter struct {
-	Policies []Policy
+	Policies []RatePolicy
 }
 
 // Handle checks if the client is within the limits enforced by the policies
 // and returns the appropriate boolean value.
 func (rl *RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		policy := rl.getPolicy(r.URL.Path)
+		policy := rl.getRatePolicy(r.URL.Path)
 		if policy == nil {
 			// letting this request pass since no policies are set
 			handler.ServeHTTP(w, r)
@@ -54,7 +54,7 @@ func (rl *RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 // Searches the policies based on the route
-func (rl *RateLimiter) getPolicy(route string) *Policy {
+func (rl *RateLimiter) getRatePolicy(route string) *RatePolicy {
 	for _, policy := range rl.Policies {
 		if route == policy.Route {
 			return &policy
@@ -67,7 +67,7 @@ func (rl *RateLimiter) getPolicy(route string) *Policy {
 // TODO: try to use goroutines for Redis calls
 // Registers a new hit for the route from the IP in Redis.
 // Returns the current hit count or an error.
-func setHit(policy *Policy, ip string) (int, error) {
+func setHit(policy *RatePolicy, ip string) (int, error) {
 	conn := cache.NewConn()
 	defer cache.CloseConn(conn)
 
@@ -88,7 +88,7 @@ func setHit(policy *Policy, ip string) (int, error) {
 	return -1, nil
 }
 
-func showError(policy *Policy, w http.ResponseWriter, r *http.Request) {
+func showError(policy *RatePolicy, w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTooManyRequests)
 	fmt.Fprintf(w, "You have exceeded the rate limit of %d requests per %d minute(s) on this route.\n", policy.Limit, policy.Minutes)
 }
