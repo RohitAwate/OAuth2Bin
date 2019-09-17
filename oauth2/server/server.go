@@ -59,8 +59,12 @@ func (s *OA2Server) Start() {
 	}
 }
 
+// Channel over which we receive signals from the operating system
 var osSignal chan os.Signal
 
+// Configures what OS signals we wish to be notified about.
+// Fires up a goroutine which listens for these signals and
+// runs the shutdown logic when they're received.
 func setupGracefulShutdown() {
 	osSignal = make(chan os.Signal)
 	signal.Notify(osSignal, syscall.SIGTERM)
@@ -68,6 +72,7 @@ func setupGracefulShutdown() {
 	go onStopServer()
 }
 
+// Listens for OS signals and executes the shutdown logic
 func onStopServer() {
 	<-osSignal
 	cache.ClosePool()
