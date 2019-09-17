@@ -1,12 +1,10 @@
-package store
+package cache
 
 import (
 	"encoding/json"
 	"fmt"
 	"log"
 	"time"
-
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 
 	"github.com/gomodule/redigo/redis"
 )
@@ -43,8 +41,8 @@ type internalImplicitToken struct {
 // It generates and stores a token and stores it along with its meta data
 // in the Redis cache.
 func NewImplicitToken() (*ImplicitToken, error) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	var token *ImplicitToken
 	var meta *implicitTokenMeta
@@ -78,17 +76,20 @@ func NewImplicitToken() (*ImplicitToken, error) {
 // VerifyImplicitToken checks if the token exists in the Redis cache.
 // Returns true if token found, false otherwise.
 func VerifyImplicitToken(token string) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", implicitTokensSet, token))
 	return err == nil
 }
 
 func invalidateImplicitToken(accessToken string) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
-	conn.Do("HDEL", implicitTokensSet, accessToken)
+	conn := NewConn()
+	defer CloseConn(conn)
+	_, err := conn.Do("HDEL", implicitTokensSet, accessToken)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // Generates an access token.

@@ -1,11 +1,10 @@
-package store
+package cache
 
 import (
 	"log"
 	"sync"
 	"time"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 	"github.com/gomodule/redigo/redis"
 )
@@ -22,7 +21,7 @@ func init() {
 	// 5 minutes for cleaning up expired grants and tokens.
 	go func() {
 		log.Println("Housekeeping service has started")
-		conn := cache.NewConn()
+		conn := NewConn()
 		wg := sync.WaitGroup{}
 
 		for {

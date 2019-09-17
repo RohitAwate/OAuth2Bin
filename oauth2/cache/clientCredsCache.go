@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -42,8 +41,8 @@ type internalClientCredsToken struct {
 // It generates and stores a token and stores it along with its meta data
 // in the Redis cache.
 func NewClientCredsToken() (*ClientCredentialsToken, error) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	var token *ClientCredentialsToken
 	var meta *clientCredsTokenMeta
@@ -77,17 +76,20 @@ func NewClientCredsToken() (*ClientCredentialsToken, error) {
 // VerifyClientCredsToken checks if the token exists in the Redis cache.
 // Returns true if token found, false otherwise.
 func VerifyClientCredsToken(token string) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", clientCredsTokensSet, token))
 	return err == nil
 }
 
 func invalidateClientCredsToken(accessToken string) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
-	conn.Do("HDEL", clientCredsTokensSet, accessToken)
+	conn := NewConn()
+	defer CloseConn(conn)
+	_, err := conn.Do("HDEL", clientCredsTokensSet, accessToken)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // Generates an access token.

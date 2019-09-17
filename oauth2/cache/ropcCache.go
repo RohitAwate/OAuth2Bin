@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"encoding/json"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -43,8 +42,8 @@ type internalROPCToken struct {
 // It generates and stores a token and stores it along with its meta data
 // in the Redis cache.
 func NewROPCToken(refreshToken string) (*ROPCToken, error) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	var token *ROPCToken
 	var meta *ropcTokenMeta
@@ -99,8 +98,8 @@ func NewROPCRefreshToken(refreshToken string) (*ROPCToken, error) {
 // refreshToken: the token to look for in the cache
 // invalidateIfFound: if true, the token is invalidated if found
 func ROPCRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	var token internalROPCToken
 	items, err := redis.ByteSlices(conn.Do("HGETALL", ropcTokensSet))
@@ -130,17 +129,20 @@ func ROPCRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
 // VerifyROPCToken checks if the token exists in the Redis cache.
 // Returns true if token found, false otherwise.
 func VerifyROPCToken(token string) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", ropcTokensSet, token))
 	return err == nil
 }
 
 func invalidateROPCToken(accessToken string) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
-	conn.Do("HDEL", ropcTokensSet, accessToken)
+	conn := NewConn()
+	defer CloseConn(conn)
+	_, err := conn.Do("HDEL", ropcTokensSet, accessToken)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // Generates access and refresh tokens.

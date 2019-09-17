@@ -3,10 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"log"
 	"net/http"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
@@ -26,7 +26,7 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 	}
 
 	// If everything checks out, issue the token
-	token, err := store.NewROPCToken("")
+	token, err := cache.NewROPCToken("")
 	if err != nil {
 		log.Println(err)
 		if err != nil {
@@ -46,8 +46,8 @@ func handleROPCToken(w http.ResponseWriter, r *http.Request, params map[string]s
 
 func handleROPCRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	// Invalidate previously issued token
-	if store.ROPCRefreshTokenExists(params["refresh_token"], true) {
-		token, err := store.NewROPCRefreshToken(params["refresh_token"])
+	if cache.ROPCRefreshTokenExists(params["refresh_token"], true) {
+		token, err := cache.NewROPCRefreshToken(params["refresh_token"])
 		if err != nil {
 			utils.ShowJSONError(w, r, http.StatusInternalServerError, utils.RequestError{
 				Error: "Internal Server Error",

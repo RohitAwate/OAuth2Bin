@@ -3,6 +3,7 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,7 +12,6 @@ import (
 	"strings"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
-	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
@@ -62,9 +62,9 @@ func handleResponse(w http.ResponseWriter, r *http.Request) {
 	if response == "ACCEPT" {
 		switch flow {
 		case config.AuthCode:
-			redirectURI += "?code=" + store.NewAuthCodeGrant(redirectURI)
+			redirectURI += "?code=" + cache.NewAuthCodeGrant(redirectURI)
 		case config.Implicit:
-			token, err := store.NewImplicitToken()
+			token, err := cache.NewImplicitToken()
 			if err != nil {
 				utils.ShowError(w, r, 500, "Internal Server Error", "Token generation failed. Please try again.")
 				return
@@ -116,9 +116,9 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if strings.HasPrefix(params["refresh_token"], store.AuthCodeFlowID) {
+		if strings.HasPrefix(params["refresh_token"], cache.AuthCodeFlowID) {
 			handleAuthCodeRefresh(w, r, params)
-		} else if strings.HasPrefix(params["refresh_token"], store.ROPCFlowID) {
+		} else if strings.HasPrefix(params["refresh_token"], cache.ROPCFlowID) {
 			handleROPCRefresh(w, r, params)
 		}
 	default:

@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"crypto/sha256"

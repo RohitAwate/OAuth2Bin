@@ -3,10 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"log"
 	"net/http"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
@@ -21,7 +21,7 @@ func handleClientCredsToken(w http.ResponseWriter, r *http.Request, params map[s
 	}
 
 	// If everything checks out, issue the token
-	token, err := store.NewClientCredsToken()
+	token, err := cache.NewClientCredsToken()
 	if err != nil {
 		log.Println(err)
 		if err != nil {

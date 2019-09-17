@@ -3,10 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"net/http"
 
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
-	"github.com/RohitAwate/OAuth2Bin/oauth2/store"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
@@ -40,7 +40,7 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 		return
 	}
 
-	token, err := store.NewAuthCodeToken(params["code"], "", params["redirect_uri"])
+	token, err := cache.NewAuthCodeToken(params["code"], "", params["redirect_uri"])
 	if err != nil {
 		utils.ShowJSONError(w, r, 400, utils.RequestError{
 			Error: "invalid_request",
@@ -66,8 +66,8 @@ func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[st
 	}
 
 	// If found, invalidate previously issued token
-	if store.AuthCodeRefreshTokenExists(params["refresh_token"], true) {
-		token, err := store.NewAuthCodeRefreshToken(params["refresh_token"])
+	if cache.AuthCodeRefreshTokenExists(params["refresh_token"], true) {
+		token, err := cache.NewAuthCodeRefreshToken(params["refresh_token"])
 		if err != nil {
 			utils.ShowJSONError(w, r, 500, utils.RequestError{
 				Error: "Internal Server Error",

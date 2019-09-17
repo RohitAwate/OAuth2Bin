@@ -1,4 +1,4 @@
-package store
+package cache
 
 import (
 	"encoding/json"
@@ -7,7 +7,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/gomodule/redigo/redis"
 )
 
@@ -52,8 +51,8 @@ type internalAuthCodeToken struct {
 // Refer RFC 6749 Section 4.1.2 (https://tools.ietf.org/html/rfc6749#section-4.1.2)
 func NewAuthCodeToken(code, refreshToken, redirectURI string) (*AuthCodeToken, error) {
 	// First check if such an authorization grant has been issued
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	value := code + ":" + redirectURI
 
@@ -146,8 +145,8 @@ func NewAuthCodeGrant(redirectURI string) string {
 	var err error
 
 	// In case we get a duplicate value, we iterate until we get a unique one.
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 	for reply == 0 {
 		code = generateNonce(20)
 		value := code + ":" + redirectURI
@@ -167,8 +166,8 @@ func NewAuthCodeGrant(redirectURI string) string {
 // refreshToken: the token to look for in the cache
 // invalidateIfFound: if true, the token is invalidated if found
 func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	var token internalAuthCodeToken
 	items, err := redis.ByteSlices(conn.Do("HGETALL", authCodeTokensSet))
@@ -198,23 +197,29 @@ func AuthCodeRefreshTokenExists(refreshToken string, invalidateIfFound bool) boo
 // VerifyAuthCodeToken checks if the token exists in the Redis cache.
 // Returns true if token found, false otherwise.
 func VerifyAuthCodeToken(token string) bool {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
+	conn := NewConn()
+	defer CloseConn(conn)
 
 	_, err := redis.String(conn.Do("HGET", authCodeTokensSet, token))
 	return err == nil
 }
 
 func removeAuthCodeGrant(code, redirectURI string) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
-	conn.Do("HDEL", authCodeGrantSet, code+":"+redirectURI)
+	conn := NewConn()
+	defer CloseConn(conn)
+	_, err := conn.Do("HDEL", authCodeGrantSet, code+":"+redirectURI)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func invalidateAuthCodeToken(accessToken string) {
-	conn := cache.NewConn()
-	defer cache.CloseConn(conn)
-	conn.Do("HDEL", authCodeTokensSet, accessToken)
+	conn := NewConn()
+	defer CloseConn(conn)
+	_, err := conn.Do("HDEL", authCodeTokensSet, accessToken)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // Generates access and refresh tokens.
