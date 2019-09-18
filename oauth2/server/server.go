@@ -49,13 +49,48 @@ func (s *OA2Server) SetRateLimiter(policies []middleware.RatePolicy) {
 
 // Start sets up the static file server, handling routes and then starts listening for requests
 func (s *OA2Server) Start() {
-	setupRoutes(s)
-	setupGracefulShutdown()
+	s.setupRoutes()
 
 	log.Printf("OAuth 2.0 Server has started on port %s\n", s.Port)
 	err := http.ListenAndServe(":"+s.Port, nil)
 	if err != nil && err != http.ErrServerClosed {
 		log.Fatalf("Could not start server on port %s\n", s.Port)
+	}
+}
+
+func (s *OA2Server) chainCommonMiddleware(pattern string, handler http.HandlerFunc, extras ...middleware.Middleware) {
+	middlewareSlice := []middleware.Middleware{s.Limiter, middleware.NewNotFoundMiddleware(pattern)}
+	middlewareSlice = append(middlewareSlice, extras...)
+	chain := middleware.Chain(handler, middlewareSlice...)
+	http.HandleFunc(pattern, chain)
+}
+
+func (s *OA2Server) setupRoutes() {
+	public := http.FileServer(http.Dir("public/"))
+	http.Handle("/public/", http.StripPrefix("/public/", public))
+
+	s.chainCommonMiddleware("/", s.handleHome)
+	s.chainCommonMiddleware("/authorize", handleAuth)
+	s.chainCommonMiddleware("/response", handleResponse, middleware.NewPostFormValidator(true))
+	s.chainCommonMiddleware("/token", handleToken, middleware.NewPostFormValidator(false))
+	s.chainCommonMiddleware("/echo", handleEcho)
+}
+
+// Serves the home page
+func (s *OA2Server) handleHome(w http.ResponseWriter, r *http.Request) {
+	tmpl, err := template.ParseFiles(
+		"public/templates/index.html",
+		"public/templates/nav.html",
+		"public/templates/cards.html",
+		"public/templates/footer.html",
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = tmpl.ExecuteTemplate(w, "home", s.Config)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
 
@@ -77,84 +112,6 @@ func onStopServer() {
 	<-osSignal
 	cache.ClosePool()
 	os.Exit(0)
-}
-
-func setupRoutes(s *OA2Server) {
-	public := http.FileServer(http.Dir("public/"))
-	http.Handle("/public/", http.StripPrefix("/public/", public))
-
-	s.route("/", s.handleHome)
-	s.route("/authorize", handleAuth)
-	s.route("/response", func(w http.ResponseWriter, r *http.Request) {
-		pfv := middleware.PostFormValidator{
-			Request:     r,
-			VisualError: true,
-		}
-
-		pfv.Handle(handleResponse)(w, r)
-	})
-	s.route("/token", func(w http.ResponseWriter, r *http.Request) {
-		pfv := middleware.PostFormValidator{
-			Request:     r,
-			VisualError: false,
-		}
-
-		pfv.Handle(handleToken)(w, r)
-	})
-	s.route("/echo", handleEcho)
-}
-
-// Registers a callback for the specified URL pattern.
-// The callback first examines if request route matches the pattern.
-// If not, the 404 logic is triggered. This is the purpose behind the existence
-// of this method.
-//
-// However, if the paths match, the IP limiter is triggered which returns another callback.
-// This callback is called by passing it the RequestWriter and the Request pointer.
-func (s *OA2Server) route(pattern string, handler http.HandlerFunc) {
-	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path != pattern {
-			handleNotFound(w, r)
-			return
-		}
-
-		s.Limiter.Handle(handler)(w, r)
-	})
-}
-
-// Serves the home page
-func (s *OA2Server) handleHome(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(
-		"public/templates/index.html",
-		"public/templates/nav.html",
-		"public/templates/cards.html",
-		"public/templates/footer.html",
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = tmpl.ExecuteTemplate(w, "home", s.Config)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Serves the 404 page
-func handleNotFound(w http.ResponseWriter, r *http.Request) {
-	tmpl, err := template.ParseFiles(
-		"public/templates/404.html",
-		"public/templates/nav.html",
-		"public/templates/footer.html",
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = tmpl.ExecuteTemplate(w, "404", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
 }
 
 // Reads the server config from the specified path and returns it

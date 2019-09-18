@@ -29,7 +29,7 @@ type RateLimiter struct {
 
 // Handle checks if the client is within the limits enforced by the policies
 // and returns the appropriate boolean value.
-func (rl *RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
+func (rl RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		policy := rl.getRatePolicy(r.URL.Path)
 		if policy == nil {
@@ -54,7 +54,7 @@ func (rl *RateLimiter) Handle(handler http.HandlerFunc) http.HandlerFunc {
 }
 
 // Searches the policies based on the route
-func (rl *RateLimiter) getRatePolicy(route string) *RatePolicy {
+func (rl RateLimiter) getRatePolicy(route string) *RatePolicy {
 	for _, policy := range rl.Policies {
 		if route == policy.Route {
 			return &policy

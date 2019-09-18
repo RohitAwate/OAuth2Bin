@@ -14,10 +14,7 @@ import (
 // package while running tests.
 func TestPostFormValidatorHandle(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		pfv := PostFormValidator{
-			Request:     r,
-			VisualError: false,
-		}
+		pfv := NewPostFormValidator(false)
 
 		pfv.Handle(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintln(w, "Testing PostFormValidator for textual output")
