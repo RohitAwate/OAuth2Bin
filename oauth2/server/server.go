@@ -50,6 +50,7 @@ func (s *OA2Server) SetRateLimiter(policies []middleware.RatePolicy) {
 // Start sets up the static file server, handling routes and then starts listening for requests
 func (s *OA2Server) Start() {
 	s.setupRoutes()
+	setupGracefulShutdown()
 
 	log.Printf("OAuth 2.0 Server has started on port %s\n", s.Port)
 	err := http.ListenAndServe(":"+s.Port, nil)
