@@ -15,7 +15,7 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="404.svg"
    inkscape:export-filename="/home/rohit/go/src/github.com/RohitAwate/OAuth2Bin/public/static/logo.png"
    inkscape:export-xdpi="25.4"
@@ -114,15 +114,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="1440.3372"
+     inkscape:cx="963.19434"
      inkscape:cy="1074.1686"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1920"
-     inkscape:window-height="976"
-     inkscape:window-x="0"
-     inkscape:window-y="27"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
@@ -192,18 +192,24 @@
          x="201.08333"
          y="31.197115"
          style="stroke-width:0.26458332" /></text>
-    <text
-       xml:space="preserve"
+    <g
+       aria-label="404"
+       transform="matrix(0.89640884,0,0,0.89640884,23.19165,5.8525147)"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;filter:url(#filter4802)"
-       x="96.511169"
-       y="129.17857"
-       id="text925"
-       transform="matrix(0.89640884,0,0,0.89640884,23.19165,5.8525147)"><tspan
-         sodipodi:role="line"
-         x="96.511169"
-         y="129.17857"
+       id="text925">
+      <path
+         d="m 162.657,129.17857 h 20.46111 v -26.81111 h 15.69861 V 83.141074 H 183.11811 V 5.7063538 H 162.657 L 103.56672,89.314685 V 102.36746 H 162.657 Z m 0,-46.037496 H 130.73061 L 162.657,34.986909 Z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;line-height:0.89999998;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
-         id="tspan43">404</tspan></text>
+         id="path843" />
+      <path
+         d="m 259.35945,131.29524 c 35.10139,0 44.80278,-34.572221 44.80278,-63.852776 0,-30.691666 -10.05417,-63.8527769 -44.80278,-63.8527769 -35.10138,0 -44.62638,34.5722219 -44.62638,63.8527769 0,30.515277 10.05416,63.852776 44.62638,63.852776 z m 0,-19.75555 c -18.52083,0 -23.63611,-22.225005 -23.63611,-44.097226 0,-21.166667 4.93889,-44.097222 23.63611,-44.097222 18.34445,0 23.63611,22.225 23.63611,44.097222 0,21.166666 -4.93888,44.097226 -23.63611,44.097226 z m 0,-31.573615 c 7.05556,0 12.52361,-5.468056 12.52361,-12.523611 0,-6.879167 -5.46805,-12.347222 -12.52361,-12.347222 -7.05555,0 -12.34722,5.468055 -12.34722,12.347222 0,7.055555 5.29167,12.523611 12.34722,12.523611 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;line-height:0.89999998;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+         id="path845" />
+      <path
+         d="m 379.69802,129.17857 h 20.46111 v -26.81111 h 15.69861 V 83.141074 H 400.15913 V 5.7063538 H 379.69802 L 320.60774,89.314685 v 13.052775 h 59.09028 z m 0,-46.037496 h -31.92639 l 31.92639,-48.154165 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;line-height:0.89999998;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+         id="path847" />
+    </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot4820"

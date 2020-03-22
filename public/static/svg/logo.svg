@@ -15,7 +15,7 @@
    viewBox="0 0 512 512"
    version="1.1"
    id="svg8"
-   inkscape:version="0.92.3 (2405546, 2018-03-11)"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="/home/rohit/go/src/github.com/RohitAwate/OAuth2Bin/public/static/logo.png"
    inkscape:export-xdpi="25.4"
@@ -126,15 +126,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.35"
-     inkscape:cx="460.52959"
+     inkscape:cx="-16.613267"
      inkscape:cy="1018.0634"
      inkscape:document-units="mm"
      inkscape:current-layer="layer1"
      showgrid="false"
-     inkscape:window-width="1869"
-     inkscape:window-height="1025"
-     inkscape:window-x="51"
-     inkscape:window-y="27"
+     inkscape:window-width="1920"
+     inkscape:window-height="1001"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
      inkscape:window-maximized="1" />
   <metadata
      id="metadata5">
@@ -204,23 +204,28 @@
          x="201.08333"
          y="31.197115"
          style="stroke-width:0.26458332" /></text>
-    <text
-       xml:space="preserve"
+    <g
+       aria-label="OA
+2B"
        style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332;filter:url(#filter4802)"
-       x="145.64807"
-       y="-0.84523356"
-       id="text925"><tspan
-         sodipodi:role="line"
-         id="tspan923"
-         x="145.64807"
-         y="-0.84523356"
+       id="text925">
+      <path
+         d="m 199.97585,81.271433 c 33.16111,0 46.91944,-30.691666 46.91944,-63.852776 0,-33.161111 -13.75833,-63.852777 -46.91944,-63.852777 -33.16111,0 -46.74306,30.691666 -46.74306,63.852777 0,33.16111 13.58195,63.852776 46.74306,63.852776 z m 0,-19.931944 c -17.63889,0 -25.04722,-20.6375 -25.04722,-43.920832 0,-22.2250001 7.40833,-43.920833 25.04722,-43.920833 17.63889,0 25.04722,20.4611107 25.04722,43.920833 0,22.04861 -7.58472,43.920832 -25.04722,43.920832 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
-         dy="80">OA</tspan><tspan
-         sodipodi:role="line"
-         x="145.64807"
-         y="219.64087"
+         id="path844" />
+      <path
+         d="m 336.18941,79.154766 h 22.57778 L 318.37413,-44.317453 H 298.61858 L 258.22552,79.154766 h 22.57778 l 8.11389,-27.163888 h 39.15833 z M 294.56163,32.940878 305.49774,-3.7480097 c 0.88195,-2.8222222 2.11667,-9.1722223 2.99862,-13.7583333 0.70555,4.586111 2.11666,10.9361111 2.99861,13.7583333 l 10.93611,36.6888877 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
-         id="tspan927">2B</tspan></text>
+         id="path846" />
+      <path
+         d="m 158.52446,219.64087 h 82.72639 v -20.10833 h -58.20833 c 2.64583,-11.1125 12.69999,-19.57917 25.22361,-27.16389 17.99166,-10.40694 31.92638,-19.75555 31.92638,-42.33333 0,-20.46111 -14.46388,-35.983333 -39.15833,-35.983333 -19.05,0 -34.74861,10.759723 -40.92222,26.634723 l 18.69722,8.46667 c 3.70417,-9.34862 11.1125,-15.34584 22.57778,-15.34584 10.75972,0 17.63889,6.52639 17.63889,16.75695 0,11.1125 -9.525,17.81527 -19.75556,23.98888 -21.69583,12.52362 -40.74583,29.63334 -40.74583,65.0875 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+         id="path848" />
+      <path
+         d="m 267.57413,219.64087 h 44.27361 c 30.69167,0 41.09861,-18.87361 41.09861,-36.15972 0,-12.34722 -6.52638,-24.34166 -20.28472,-28.92778 10.93611,-4.93888 16.05139,-14.46388 16.05139,-25.39999 0,-16.58056 -9.525,-32.984727 -39.51111,-32.984727 h -41.62778 z m 20.99028,-73.55416 v -30.51528 h 21.16667 c 14.99305,0 17.99166,7.76111 17.99166,14.99306 0,9.34861 -6.87916,15.52222 -21.34305,15.52222 z m 0,54.15139 v -34.925 h 19.57917 c 19.40278,0 23.8125,9.17222 23.8125,18.34444 0,7.76111 -4.05695,16.58056 -18.69722,16.58056 z"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:176.3888855px;font-family:'Overpass Mono';-inkscape-font-specification:'Overpass Mono Bold';fill:#e6e6e6;stroke-width:0.26458332"
+         id="path850" />
+    </g>
     <flowRoot
        xml:space="preserve"
        id="flowRoot4820"
