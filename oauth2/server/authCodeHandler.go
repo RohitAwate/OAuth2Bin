@@ -57,14 +57,6 @@ func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[stri
 
 // Refer RFC 6749 Section 6 (https://tools.ietf.org/html/rfc6749#section-6)
 func handleAuthCodeRefresh(w http.ResponseWriter, r *http.Request, params map[string]string) {
-	if params["refresh_token"] == "" {
-		utils.ShowJSONError(w, r, 400, utils.RequestError{
-			Error: "invalid_request",
-			Desc:  "refresh_token required",
-		})
-		return
-	}
-
 	// If found, invalidate previously issued token
 	if cache.AuthCodeRefreshTokenExists(params["refresh_token"], true) {
 		token, err := cache.NewAuthCodeRefreshToken(params["refresh_token"])

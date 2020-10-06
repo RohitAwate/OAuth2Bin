@@ -92,7 +92,7 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 
 	params, err := utils.ParseParams(string(body))
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		utils.ShowJSONError(w, r, 400, "Expected parameters not found.")
 		return
 	}
@@ -112,7 +112,10 @@ func handleToken(w http.ResponseWriter, r *http.Request) {
 		handleClientCredsToken(w, r, params)
 	case "refresh_token":
 		if len(params["refresh_token"]) != 72 {
-			utils.ShowJSONError(w, r, 400, "refresh_token missing or invalid")
+			utils.ShowJSONError(w, r, 400, utils.RequestError{
+				Error: "invalid_request",
+				Desc:  "refresh_token missing or invalid",
+			})
 			return
 		}
 
