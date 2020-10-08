@@ -3,7 +3,6 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -11,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )

@@ -3,10 +3,10 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"log"
 	"net/http"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 

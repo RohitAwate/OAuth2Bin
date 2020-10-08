@@ -3,14 +3,14 @@ package server
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"net/http"
 
+	"github.com/RohitAwate/OAuth2Bin/oauth2/cache"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/config"
 	"github.com/RohitAwate/OAuth2Bin/oauth2/utils"
 )
 
-// handleAuth checks for the existence of client_id in the query parameters.
+// handleAuthCodeAuth checks for the existence of client_id in the query parameters.
 // If not present, an HTTP 400 response is sent.
 // If an unrecognized client_id is found, an HTTP 401 response is sent.
 // Else, an authorization screen is presented to the user.
@@ -28,9 +28,9 @@ func handleAuthCodeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// issueToken checks for the existence of all parameters detailed in Section 4.1.3 of RFC 6749 (https://tools.ietf.org/html/rfc6749#section-4.1.3).
+// handleAuthCodeToken checks for the existence of all parameters detailed in Section 4.1.3 of RFC 6749 (https://tools.ietf.org/html/rfc6749#section-4.1.3).
 // If not present, an HTTP 400 response is sent.
-// Else a new token is generated, added to the store, and returned to the user in a JSON response.
+// Else, a new token is generated, added to the store, and returned to the user in a JSON response.
 func handleAuthCodeToken(w http.ResponseWriter, r *http.Request, params map[string]string) {
 	if params["client_id"] == "" || params["grant_type"] == "" || params["code"] == "" {
 		utils.ShowJSONError(w, r, 400, utils.RequestError{
